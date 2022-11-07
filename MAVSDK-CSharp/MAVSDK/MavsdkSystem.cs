@@ -1,5 +1,5 @@
 ﻿using System;
-using Grpc.Core;
+using Grpc.Net.Client;
 using MAVSDK.Plugins;
 using Action = MAVSDK.Plugins.Action;
 
@@ -7,7 +7,7 @@ namespace MAVSDK
 {
   public class MavsdkSystem : IDisposable
   {
-    private readonly Channel _channel;
+    private readonly GrpcChannel _channel;
 
     public Action Action { get; }
     public ActionServer ActionServer { get; }
@@ -41,9 +41,9 @@ namespace MAVSDK
     public Tune Tune { get; }
 
 
-    public MavsdkSystem(string host, int port)
+    public MavsdkSystem(Uri address)
     {
-      _channel = new Channel(host, port, ChannelCredentials.Insecure);
+      _channel = GrpcChannel.ForAddress(address);
 
       Action = new Action(_channel);
       ActionServer = new ActionServer(_channel);

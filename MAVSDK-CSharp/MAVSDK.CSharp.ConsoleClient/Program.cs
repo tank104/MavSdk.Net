@@ -22,7 +22,7 @@ namespace MAVSDK.CSharp.ConsoleClient
        *     - emit an event only when the value changes
        *     - discard the altitudes lower than 0
        */
-      var drone = new MavsdkSystem(Host, Port);
+      var drone = new MavsdkSystem(new Uri($"http://{Host}:{Port}"));
       var tcs = new TaskCompletionSource<bool>();
 
       drone.Telemetry.Position()

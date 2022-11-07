@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.MissionRaw;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly MissionRawService.MissionRawServiceClient _missionRawServiceClient;
 
-    internal MissionRaw(Channel channel)
+    internal MissionRaw(GrpcChannel channel)
     {
       _missionRawServiceClient = new MissionRawService.MissionRawServiceClient(channel);
     }
@@ -186,44 +187,46 @@ namespace MAVSDK.Plugins
 
         public IObservable<MissionProgress> MissionProgress()
         {
-          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()).ResponseStream,
+          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()),
           reader => Observable.Create(
             async (IObserver<MissionProgress> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.MissionProgress);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.MissionProgress);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> MissionChanged()
         {
-          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionChanged(new SubscribeMissionChangedRequest()).ResponseStream,
+          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionChanged(new SubscribeMissionChangedRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.MissionChanged);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.MissionChanged);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<MissionImportData> ImportQgroundcontrolMission(string qgcPlanPath)

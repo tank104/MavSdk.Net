@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.ActionServer;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,233 +17,240 @@ namespace MAVSDK.Plugins
   {
     private readonly ActionServerService.ActionServerServiceClient _actionServerServiceClient;
 
-    internal ActionServer(Channel channel)
+    internal ActionServer(GrpcChannel channel)
     {
       _actionServerServiceClient = new ActionServerService.ActionServerServiceClient(channel);
     }
 
         public IObservable<ArmDisarm> ArmDisarm()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeArmDisarm(new SubscribeArmDisarmRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeArmDisarm(new SubscribeArmDisarmRequest()),
           reader => Observable.Create(
             async (IObserver<ArmDisarm> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Arm);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Arm);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<FlightMode> FlightModeChange()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeFlightModeChange(new SubscribeFlightModeChangeRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeFlightModeChange(new SubscribeFlightModeChangeRequest()),
           reader => Observable.Create(
             async (IObserver<FlightMode> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.FlightMode);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.FlightMode);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Takeoff()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeTakeoff(new SubscribeTakeoffRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeTakeoff(new SubscribeTakeoffRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Takeoff);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Takeoff);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Land()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeLand(new SubscribeLandRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeLand(new SubscribeLandRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Land);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Land);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Reboot()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeReboot(new SubscribeRebootRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeReboot(new SubscribeRebootRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Reboot);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Reboot);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Shutdown()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeShutdown(new SubscribeShutdownRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeShutdown(new SubscribeShutdownRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Shutdown);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Shutdown);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Terminate()
         {
-          return Observable.Using(() => _actionServerServiceClient.SubscribeTerminate(new SubscribeTerminateRequest()).ResponseStream,
+          return Observable.Using(() => _actionServerServiceClient.SubscribeTerminate(new SubscribeTerminateRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.ActionServerResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.ActionServerResult;
+                  switch (result.Result)
+                  {
+                    case ActionServerResult.Types.Result.Success:
+                    //case ActionServerResult.Types.Result.InProgress:
+                    //case ActionServerResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Terminate);
+                    break;
+                    default:
+                    observer.OnError(new ActionServerException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case ActionServerResult.Types.Result.Success:
-                //case ActionServerResult.Types.Result.InProgress:
-                //case ActionServerResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Terminate);
-                break;
-                default:
-                observer.OnError(new ActionServerException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> SetAllowTakeoff(bool allowTakeoff)

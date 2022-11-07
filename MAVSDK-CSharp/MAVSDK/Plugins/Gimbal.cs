@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Gimbal;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly GimbalService.GimbalServiceClient _gimbalServiceClient;
 
-    internal Gimbal(Channel channel)
+    internal Gimbal(GrpcChannel channel)
     {
       _gimbalServiceClient = new GimbalService.GimbalServiceClient(channel);
     }
@@ -152,23 +153,24 @@ namespace MAVSDK.Plugins
 
         public IObservable<ControlStatus> Control()
         {
-          return Observable.Using(() => _gimbalServiceClient.SubscribeControl(new SubscribeControlRequest()).ResponseStream,
+          return Observable.Using(() => _gimbalServiceClient.SubscribeControl(new SubscribeControlRequest()),
           reader => Observable.Create(
             async (IObserver<ControlStatus> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.ControlStatus);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.ControlStatus);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
   }
 

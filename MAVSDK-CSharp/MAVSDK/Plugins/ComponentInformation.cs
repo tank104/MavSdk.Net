@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.ComponentInformation;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly ComponentInformationService.ComponentInformationServiceClient _componentInformationServiceClient;
 
-    internal ComponentInformation(Channel channel)
+    internal ComponentInformation(GrpcChannel channel)
     {
       _componentInformationServiceClient = new ComponentInformationService.ComponentInformationServiceClient(channel);
     }
@@ -44,23 +45,24 @@ namespace MAVSDK.Plugins
 
         public IObservable<FloatParamUpdate> FloatParam()
         {
-          return Observable.Using(() => _componentInformationServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()).ResponseStream,
+          return Observable.Using(() => _componentInformationServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()),
           reader => Observable.Create(
             async (IObserver<FloatParamUpdate> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.ParamUpdate);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.ParamUpdate);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
   }
 

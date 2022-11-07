@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Shell;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly ShellService.ShellServiceClient _shellServiceClient;
 
-    internal Shell(Channel channel)
+    internal Shell(GrpcChannel channel)
     {
       _shellServiceClient = new ShellService.ShellServiceClient(channel);
     }
@@ -44,23 +45,24 @@ namespace MAVSDK.Plugins
 
         public IObservable<string> Receive()
         {
-          return Observable.Using(() => _shellServiceClient.SubscribeReceive(new SubscribeReceiveRequest()).ResponseStream,
+          return Observable.Using(() => _shellServiceClient.SubscribeReceive(new SubscribeReceiveRequest()),
           reader => Observable.Create(
             async (IObserver<string> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Data);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Data);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
   }
 

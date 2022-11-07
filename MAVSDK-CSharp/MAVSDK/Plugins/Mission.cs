@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Mission;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly MissionService.MissionServiceClient _missionServiceClient;
 
-    internal Mission(Channel channel)
+    internal Mission(GrpcChannel channel)
     {
       _missionServiceClient = new MissionService.MissionServiceClient(channel);
     }
@@ -44,34 +45,35 @@ namespace MAVSDK.Plugins
 
         public IObservable<ProgressData> UploadMissionWithProgress()
         {
-          return Observable.Using(() => _missionServiceClient.SubscribeUploadMissionWithProgress(new SubscribeUploadMissionWithProgressRequest()).ResponseStream,
+          return Observable.Using(() => _missionServiceClient.SubscribeUploadMissionWithProgress(new SubscribeUploadMissionWithProgressRequest()),
           reader => Observable.Create(
             async (IObserver<ProgressData> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.MissionResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.MissionResult;
+                  switch (result.Result)
+                  {
+                    case MissionResult.Types.Result.Success:
+                    //case MissionResult.Types.Result.InProgress:
+                    //case MissionResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.ProgressData);
+                    break;
+                    default:
+                    observer.OnError(new MissionException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case MissionResult.Types.Result.Success:
-                //case MissionResult.Types.Result.InProgress:
-                //case MissionResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.ProgressData);
-                break;
-                default:
-                observer.OnError(new MissionException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> CancelMissionUpload()
@@ -117,34 +119,35 @@ namespace MAVSDK.Plugins
 
         public IObservable<ProgressDataOrMission> DownloadMissionWithProgress()
         {
-          return Observable.Using(() => _missionServiceClient.SubscribeDownloadMissionWithProgress(new SubscribeDownloadMissionWithProgressRequest()).ResponseStream,
+          return Observable.Using(() => _missionServiceClient.SubscribeDownloadMissionWithProgress(new SubscribeDownloadMissionWithProgressRequest()),
           reader => Observable.Create(
             async (IObserver<ProgressDataOrMission> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.MissionResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.MissionResult;
+                  switch (result.Result)
+                  {
+                    case MissionResult.Types.Result.Success:
+                    //case MissionResult.Types.Result.InProgress:
+                    //case MissionResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.ProgressData);
+                    break;
+                    default:
+                    observer.OnError(new MissionException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case MissionResult.Types.Result.Success:
-                //case MissionResult.Types.Result.InProgress:
-                //case MissionResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.ProgressData);
-                break;
-                default:
-                observer.OnError(new MissionException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> CancelMissionDownload()
@@ -271,23 +274,24 @@ namespace MAVSDK.Plugins
 
         public IObservable<MissionProgress> MissionProgress()
         {
-          return Observable.Using(() => _missionServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()).ResponseStream,
+          return Observable.Using(() => _missionServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()),
           reader => Observable.Create(
             async (IObserver<MissionProgress> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.MissionProgress);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.MissionProgress);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> GetReturnToLaunchAfterMission()

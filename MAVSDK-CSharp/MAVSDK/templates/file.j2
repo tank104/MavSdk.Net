@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.{{ plugin_name.upper_camel_case }};
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient _{{ plugin_name.lower_camel_case }}ServiceClient;
 
-    internal {{ plugin_name.upper_camel_case }}(Channel channel)
+    internal {{ plugin_name.upper_camel_case }}(GrpcChannel channel)
     {
       _{{ plugin_name.lower_camel_case }}ServiceClient = new {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient(channel);
     }
