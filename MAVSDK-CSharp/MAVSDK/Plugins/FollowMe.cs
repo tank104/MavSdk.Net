@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.FollowMe;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly FollowMeService.FollowMeServiceClient _followMeServiceClient;
 
-    internal FollowMe(Channel channel)
+    internal FollowMe(GrpcChannel channel)
     {
       _followMeServiceClient = new FollowMeService.FollowMeServiceClient(channel);
     }

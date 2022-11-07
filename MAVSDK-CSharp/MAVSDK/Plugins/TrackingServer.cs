@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.TrackingServer;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly TrackingServerService.TrackingServerServiceClient _trackingServerServiceClient;
 
-    internal TrackingServer(Channel channel)
+    internal TrackingServer(GrpcChannel channel)
     {
       _trackingServerServiceClient = new TrackingServerService.TrackingServerServiceClient(channel);
     }
@@ -61,65 +62,68 @@ namespace MAVSDK.Plugins
 
         public IObservable<TrackPoint> TrackingPointCommand()
         {
-          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingPointCommand(new SubscribeTrackingPointCommandRequest()).ResponseStream,
+          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingPointCommand(new SubscribeTrackingPointCommandRequest()),
           reader => Observable.Create(
             async (IObserver<TrackPoint> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.TrackPoint);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.TrackPoint);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<TrackRectangle> TrackingRectangleCommand()
         {
-          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingRectangleCommand(new SubscribeTrackingRectangleCommandRequest()).ResponseStream,
+          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingRectangleCommand(new SubscribeTrackingRectangleCommandRequest()),
           reader => Observable.Create(
             async (IObserver<TrackRectangle> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.TrackRectangle);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.TrackRectangle);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<int> TrackingOffCommand()
         {
-          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingOffCommand(new SubscribeTrackingOffCommandRequest()).ResponseStream,
+          return Observable.Using(() => _trackingServerServiceClient.SubscribeTrackingOffCommand(new SubscribeTrackingOffCommandRequest()),
           reader => Observable.Create(
             async (IObserver<int> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Dummy);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Dummy);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> RespondTrackingPointCommand(CommandAnswer commandAnswer)

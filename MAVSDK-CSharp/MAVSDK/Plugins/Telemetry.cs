@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Telemetry;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,702 +17,735 @@ namespace MAVSDK.Plugins
   {
     private readonly TelemetryService.TelemetryServiceClient _telemetryServiceClient;
 
-    internal Telemetry(Channel channel)
+    internal Telemetry(GrpcChannel channel)
     {
       _telemetryServiceClient = new TelemetryService.TelemetryServiceClient(channel);
     }
 
         public IObservable<Position> Position()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribePosition(new SubscribePositionRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribePosition(new SubscribePositionRequest()),
           reader => Observable.Create(
             async (IObserver<Position> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Position);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Position);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Position> Home()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeHome(new SubscribeHomeRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeHome(new SubscribeHomeRequest()),
           reader => Observable.Create(
             async (IObserver<Position> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Home);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Home);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> InAir()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeInAir(new SubscribeInAirRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeInAir(new SubscribeInAirRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.IsInAir);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.IsInAir);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<LandedState> LandedState()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeLandedState(new SubscribeLandedStateRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeLandedState(new SubscribeLandedStateRequest()),
           reader => Observable.Create(
             async (IObserver<LandedState> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.LandedState);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.LandedState);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> Armed()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeArmed(new SubscribeArmedRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeArmed(new SubscribeArmedRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.IsArmed);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.IsArmed);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<VtolState> VtolState()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeVtolState(new SubscribeVtolStateRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeVtolState(new SubscribeVtolStateRequest()),
           reader => Observable.Create(
             async (IObserver<VtolState> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.VtolState);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.VtolState);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Quaternion> AttitudeQuaternion()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeQuaternion(new SubscribeAttitudeQuaternionRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeQuaternion(new SubscribeAttitudeQuaternionRequest()),
           reader => Observable.Create(
             async (IObserver<Quaternion> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.AttitudeQuaternion);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.AttitudeQuaternion);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<EulerAngle> AttitudeEuler()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeEuler(new SubscribeAttitudeEulerRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeEuler(new SubscribeAttitudeEulerRequest()),
           reader => Observable.Create(
             async (IObserver<EulerAngle> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.AttitudeEuler);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.AttitudeEuler);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<AngularVelocityBody> AttitudeAngularVelocityBody()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeAngularVelocityBody(new SubscribeAttitudeAngularVelocityBodyRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeAttitudeAngularVelocityBody(new SubscribeAttitudeAngularVelocityBodyRequest()),
           reader => Observable.Create(
             async (IObserver<AngularVelocityBody> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.AttitudeAngularVelocityBody);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.AttitudeAngularVelocityBody);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Quaternion> CameraAttitudeQuaternion()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeCameraAttitudeQuaternion(new SubscribeCameraAttitudeQuaternionRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeCameraAttitudeQuaternion(new SubscribeCameraAttitudeQuaternionRequest()),
           reader => Observable.Create(
             async (IObserver<Quaternion> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.AttitudeQuaternion);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.AttitudeQuaternion);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<EulerAngle> CameraAttitudeEuler()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeCameraAttitudeEuler(new SubscribeCameraAttitudeEulerRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeCameraAttitudeEuler(new SubscribeCameraAttitudeEulerRequest()),
           reader => Observable.Create(
             async (IObserver<EulerAngle> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.AttitudeEuler);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.AttitudeEuler);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<VelocityNed> VelocityNed()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeVelocityNed(new SubscribeVelocityNedRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeVelocityNed(new SubscribeVelocityNedRequest()),
           reader => Observable.Create(
             async (IObserver<VelocityNed> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.VelocityNed);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.VelocityNed);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<GpsInfo> GpsInfo()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeGpsInfo(new SubscribeGpsInfoRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeGpsInfo(new SubscribeGpsInfoRequest()),
           reader => Observable.Create(
             async (IObserver<GpsInfo> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.GpsInfo);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.GpsInfo);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<RawGps> RawGps()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeRawGps(new SubscribeRawGpsRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeRawGps(new SubscribeRawGpsRequest()),
           reader => Observable.Create(
             async (IObserver<RawGps> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.RawGps);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.RawGps);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Battery> Battery()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeBattery(new SubscribeBatteryRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeBattery(new SubscribeBatteryRequest()),
           reader => Observable.Create(
             async (IObserver<Battery> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Battery);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Battery);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<FlightMode> FlightMode()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeFlightMode(new SubscribeFlightModeRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeFlightMode(new SubscribeFlightModeRequest()),
           reader => Observable.Create(
             async (IObserver<FlightMode> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.FlightMode);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.FlightMode);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Health> Health()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeHealth(new SubscribeHealthRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeHealth(new SubscribeHealthRequest()),
           reader => Observable.Create(
             async (IObserver<Health> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Health);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Health);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<RcStatus> RcStatus()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeRcStatus(new SubscribeRcStatusRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeRcStatus(new SubscribeRcStatusRequest()),
           reader => Observable.Create(
             async (IObserver<RcStatus> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.RcStatus);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.RcStatus);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<StatusText> StatusText()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeStatusText(new SubscribeStatusTextRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeStatusText(new SubscribeStatusTextRequest()),
           reader => Observable.Create(
             async (IObserver<StatusText> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.StatusText);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.StatusText);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ActuatorControlTarget> ActuatorControlTarget()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeActuatorControlTarget(new SubscribeActuatorControlTargetRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeActuatorControlTarget(new SubscribeActuatorControlTargetRequest()),
           reader => Observable.Create(
             async (IObserver<ActuatorControlTarget> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.ActuatorControlTarget);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.ActuatorControlTarget);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ActuatorOutputStatus> ActuatorOutputStatus()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeActuatorOutputStatus(new SubscribeActuatorOutputStatusRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeActuatorOutputStatus(new SubscribeActuatorOutputStatusRequest()),
           reader => Observable.Create(
             async (IObserver<ActuatorOutputStatus> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.ActuatorOutputStatus);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.ActuatorOutputStatus);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Odometry> Odometry()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeOdometry(new SubscribeOdometryRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeOdometry(new SubscribeOdometryRequest()),
           reader => Observable.Create(
             async (IObserver<Odometry> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Odometry);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Odometry);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<PositionVelocityNed> PositionVelocityNed()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribePositionVelocityNed(new SubscribePositionVelocityNedRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribePositionVelocityNed(new SubscribePositionVelocityNedRequest()),
           reader => Observable.Create(
             async (IObserver<PositionVelocityNed> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.PositionVelocityNed);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.PositionVelocityNed);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<GroundTruth> GroundTruth()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeGroundTruth(new SubscribeGroundTruthRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeGroundTruth(new SubscribeGroundTruthRequest()),
           reader => Observable.Create(
             async (IObserver<GroundTruth> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.GroundTruth);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.GroundTruth);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<FixedwingMetrics> FixedwingMetrics()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeFixedwingMetrics(new SubscribeFixedwingMetricsRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeFixedwingMetrics(new SubscribeFixedwingMetricsRequest()),
           reader => Observable.Create(
             async (IObserver<FixedwingMetrics> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.FixedwingMetrics);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.FixedwingMetrics);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Imu> Imu()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeImu(new SubscribeImuRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeImu(new SubscribeImuRequest()),
           reader => Observable.Create(
             async (IObserver<Imu> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Imu);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Imu);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Imu> ScaledImu()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeScaledImu(new SubscribeScaledImuRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeScaledImu(new SubscribeScaledImuRequest()),
           reader => Observable.Create(
             async (IObserver<Imu> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Imu);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Imu);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Imu> RawImu()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeRawImu(new SubscribeRawImuRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeRawImu(new SubscribeRawImuRequest()),
           reader => Observable.Create(
             async (IObserver<Imu> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Imu);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Imu);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<bool> HealthAllOk()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeHealthAllOk(new SubscribeHealthAllOkRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeHealthAllOk(new SubscribeHealthAllOkRequest()),
           reader => Observable.Create(
             async (IObserver<bool> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.IsHealthAllOk);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.IsHealthAllOk);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ulong> UnixEpochTime()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeUnixEpochTime(new SubscribeUnixEpochTimeRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeUnixEpochTime(new SubscribeUnixEpochTimeRequest()),
           reader => Observable.Create(
             async (IObserver<ulong> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.TimeUs);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.TimeUs);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<DistanceSensor> DistanceSensor()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeDistanceSensor(new SubscribeDistanceSensorRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeDistanceSensor(new SubscribeDistanceSensorRequest()),
           reader => Observable.Create(
             async (IObserver<DistanceSensor> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.DistanceSensor);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.DistanceSensor);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ScaledPressure> ScaledPressure()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeScaledPressure(new SubscribeScaledPressureRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeScaledPressure(new SubscribeScaledPressureRequest()),
           reader => Observable.Create(
             async (IObserver<ScaledPressure> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.ScaledPressure);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.ScaledPressure);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Heading> Heading()
         {
-          return Observable.Using(() => _telemetryServiceClient.SubscribeHeading(new SubscribeHeadingRequest()).ResponseStream,
+          return Observable.Using(() => _telemetryServiceClient.SubscribeHeading(new SubscribeHeadingRequest()),
           reader => Observable.Create(
             async (IObserver<Heading> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.HeadingDeg);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.HeadingDeg);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> SetRatePosition(double rateHz)

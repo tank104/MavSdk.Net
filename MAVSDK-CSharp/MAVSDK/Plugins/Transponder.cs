@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Transponder;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,30 +17,31 @@ namespace MAVSDK.Plugins
   {
     private readonly TransponderService.TransponderServiceClient _transponderServiceClient;
 
-    internal Transponder(Channel channel)
+    internal Transponder(GrpcChannel channel)
     {
       _transponderServiceClient = new TransponderService.TransponderServiceClient(channel);
     }
 
         public IObservable<AdsbVehicle> ObserveTransponder()
         {
-          return Observable.Using(() => _transponderServiceClient.SubscribeTransponder(new SubscribeTransponderRequest()).ResponseStream,
+          return Observable.Using(() => _transponderServiceClient.SubscribeTransponder(new SubscribeTransponderRequest()),
           reader => Observable.Create(
             async (IObserver<AdsbVehicle> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              observer.OnNext(reader.Current.Transponder);
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  observer.OnNext(reader.ResponseStream.Current.Transponder);
+                }
+                observer.OnCompleted();
               }
-              observer.OnCompleted();
+              catch (Exception ex)
+              {
+                observer.OnError(ex);
+              }
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<Unit> SetRateTransponder(double rateHz)

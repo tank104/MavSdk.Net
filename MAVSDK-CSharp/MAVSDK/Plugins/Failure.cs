@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Failure;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly FailureService.FailureServiceClient _failureServiceClient;
 
-    internal Failure(Channel channel)
+    internal Failure(GrpcChannel channel)
     {
       _failureServiceClient = new FailureService.FailureServiceClient(channel);
     }

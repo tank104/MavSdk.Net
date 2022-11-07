@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Info;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly InfoService.InfoServiceClient _infoServiceClient;
 
-    internal Info(Channel channel)
+    internal Info(GrpcChannel channel)
     {
       _infoServiceClient = new InfoService.InfoServiceClient(channel);
     }

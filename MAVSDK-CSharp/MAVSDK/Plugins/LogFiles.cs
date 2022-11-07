@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.LogFiles;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly LogFilesService.LogFilesServiceClient _logFilesServiceClient;
 
-    internal LogFiles(Channel channel)
+    internal LogFiles(GrpcChannel channel)
     {
       _logFilesServiceClient = new LogFilesService.LogFilesServiceClient(channel);
     }
@@ -44,34 +45,35 @@ namespace MAVSDK.Plugins
 
         public IObservable<ProgressData> DownloadLogFile()
         {
-          return Observable.Using(() => _logFilesServiceClient.SubscribeDownloadLogFile(new SubscribeDownloadLogFileRequest()).ResponseStream,
+          return Observable.Using(() => _logFilesServiceClient.SubscribeDownloadLogFile(new SubscribeDownloadLogFileRequest()),
           reader => Observable.Create(
             async (IObserver<ProgressData> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.LogFilesResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.LogFilesResult;
+                  switch (result.Result)
+                  {
+                    case LogFilesResult.Types.Result.Success:
+                    //case LogFilesResult.Types.Result.InProgress:
+                    //case LogFilesResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.Progress);
+                    break;
+                    default:
+                    observer.OnError(new LogFilesException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case LogFilesResult.Types.Result.Success:
-                //case LogFilesResult.Types.Result.InProgress:
-                //case LogFilesResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.Progress);
-                break;
-                default:
-                observer.OnError(new LogFilesException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ProgressData> DownloadLogFile(Entry entry, string path)

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using Mavsdk.Rpc.Ftp;
 
 using Version = Mavsdk.Rpc.Info.Version;
@@ -16,7 +17,7 @@ namespace MAVSDK.Plugins
   {
     private readonly FtpService.FtpServiceClient _ftpServiceClient;
 
-    internal Ftp(Channel channel)
+    internal Ftp(GrpcChannel channel)
     {
       _ftpServiceClient = new FtpService.FtpServiceClient(channel);
     }
@@ -43,66 +44,68 @@ namespace MAVSDK.Plugins
 
         public IObservable<ProgressData> Download()
         {
-          return Observable.Using(() => _ftpServiceClient.SubscribeDownload(new SubscribeDownloadRequest()).ResponseStream,
+          return Observable.Using(() => _ftpServiceClient.SubscribeDownload(new SubscribeDownloadRequest()),
           reader => Observable.Create(
             async (IObserver<ProgressData> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.FtpResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.FtpResult;
+                  switch (result.Result)
+                  {
+                    case FtpResult.Types.Result.Success:
+                    //case FtpResult.Types.Result.InProgress:
+                    //case FtpResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.ProgressData);
+                    break;
+                    default:
+                    observer.OnError(new FtpException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case FtpResult.Types.Result.Success:
-                //case FtpResult.Types.Result.InProgress:
-                //case FtpResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.ProgressData);
-                break;
-                default:
-                observer.OnError(new FtpException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<ProgressData> Upload()
         {
-          return Observable.Using(() => _ftpServiceClient.SubscribeUpload(new SubscribeUploadRequest()).ResponseStream,
+          return Observable.Using(() => _ftpServiceClient.SubscribeUpload(new SubscribeUploadRequest()),
           reader => Observable.Create(
             async (IObserver<ProgressData> observer) =>
             {
-            try
-            {
-              while (await reader.MoveNext())
+              try
               {
-              var result = reader.Current.FtpResult;
-              switch (result.Result)
+                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+                {
+                  var result = reader.ResponseStream.Current.FtpResult;
+                  switch (result.Result)
+                  {
+                    case FtpResult.Types.Result.Success:
+                    //case FtpResult.Types.Result.InProgress:
+                    //case FtpResult.Types.Result.Instruction:
+                    observer.OnNext(reader.ResponseStream.Current.ProgressData);
+                    break;
+                    default:
+                    observer.OnError(new FtpException(result.Result, result.ResultStr));
+                    break;
+                  }
+                }
+                observer.OnCompleted();
+              }
+              catch (Exception ex)
               {
-                case FtpResult.Types.Result.Success:
-                //case FtpResult.Types.Result.InProgress:
-                //case FtpResult.Types.Result.Instruction:
-                observer.OnNext(reader.Current.ProgressData);
-                break;
-                default:
-                observer.OnError(new FtpException(result.Result, result.ResultStr));
-                break;
+                observer.OnError(ex);
               }
-              }
-              observer.OnCompleted();
             }
-            catch (Exception ex)
-            {
-              observer.OnError(ex);
-            }
-            }));
+          ));
         }
 
         public IObservable<List<string>> ListDirectory(string remoteDir)
