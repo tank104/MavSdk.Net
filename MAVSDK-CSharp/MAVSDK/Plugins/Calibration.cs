@@ -12,165 +12,205 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MAVSDK.Plugins
 {
-    public class Calibration
-    {
-        private readonly CalibrationService.CalibrationServiceClient _calibrationServiceClient;
+  public class Calibration
+  {
+    private readonly CalibrationService.CalibrationServiceClient _calibrationServiceClient;
 
-        internal Calibration(Channel channel)
-        {
-            _calibrationServiceClient = new CalibrationService.CalibrationServiceClient(channel);
-        }
+    internal Calibration(Channel channel)
+    {
+      _calibrationServiceClient = new CalibrationService.CalibrationServiceClient(channel);
+    }
 
         public IObservable<ProgressData> CalibrateGyro()
         {
-            return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateGyro(new SubscribeCalibrateGyroRequest()).ResponseStream,
-                reader => Observable.Create(
-                    async (IObserver<ProgressData> observer) =>
-                    {
-                        try
-                        {
-                            while (await reader.MoveNext())
-                            {
-                                var result = reader.Current.CalibrationResult;
-                                switch (result.Result)
-                                {
-                                    case CalibrationResult.Types.Result.Success:
-                                    case CalibrationResult.Types.Result.InProgress:
-                                    case CalibrationResult.Types.Result.Instruction:
-                                        observer.OnNext(reader.Current.ProgressData);
-                                        break;
-                                    default:
-                                        observer.OnError(new CalibrationException(result.Result, result.ResultStr));
-                                        break;
-                                }
-                            }
-                            observer.OnCompleted();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    }));
+          return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateGyro(new SubscribeCalibrateGyroRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ProgressData> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              var result = reader.Current.CalibrationResult;
+              switch (result.Result)
+              {
+                case CalibrationResult.Types.Result.Success:
+                //case CalibrationResult.Types.Result.InProgress:
+                //case CalibrationResult.Types.Result.Instruction:
+                observer.OnNext(reader.Current.ProgressData);
+                break;
+                default:
+                observer.OnError(new CalibrationException(result.Result, result.ResultStr));
+                break;
+              }
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
         }
 
         public IObservable<ProgressData> CalibrateAccelerometer()
         {
-            return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateAccelerometer(new SubscribeCalibrateAccelerometerRequest()).ResponseStream,
-                reader => Observable.Create(
-                    async (IObserver<ProgressData> observer) =>
-                    {
-                        try
-                        {
-                            while (await reader.MoveNext())
-                            {
-                                var result = reader.Current.CalibrationResult;
-                                switch (result.Result)
-                                {
-                                    case CalibrationResult.Types.Result.Success:
-                                    case CalibrationResult.Types.Result.InProgress:
-                                    case CalibrationResult.Types.Result.Instruction:
-                                        observer.OnNext(reader.Current.ProgressData);
-                                        break;
-                                    default:
-                                        observer.OnError(new CalibrationException(result.Result, result.ResultStr));
-                                        break;
-                                }
-                            }
-                            observer.OnCompleted();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    }));
+          return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateAccelerometer(new SubscribeCalibrateAccelerometerRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ProgressData> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              var result = reader.Current.CalibrationResult;
+              switch (result.Result)
+              {
+                case CalibrationResult.Types.Result.Success:
+                //case CalibrationResult.Types.Result.InProgress:
+                //case CalibrationResult.Types.Result.Instruction:
+                observer.OnNext(reader.Current.ProgressData);
+                break;
+                default:
+                observer.OnError(new CalibrationException(result.Result, result.ResultStr));
+                break;
+              }
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
         }
 
         public IObservable<ProgressData> CalibrateMagnetometer()
         {
-            return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateMagnetometer(new SubscribeCalibrateMagnetometerRequest()).ResponseStream,
-                reader => Observable.Create(
-                    async (IObserver<ProgressData> observer) =>
-                    {
-                        try
-                        {
-                            while (await reader.MoveNext())
-                            {
-                                var result = reader.Current.CalibrationResult;
-                                switch (result.Result)
-                                {
-                                    case CalibrationResult.Types.Result.Success:
-                                    case CalibrationResult.Types.Result.InProgress:
-                                    case CalibrationResult.Types.Result.Instruction:
-                                        observer.OnNext(reader.Current.ProgressData);
-                                        break;
-                                    default:
-                                        observer.OnError(new CalibrationException(result.Result, result.ResultStr));
-                                        break;
-                                }
-                            }
-                            observer.OnCompleted();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    }));
+          return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateMagnetometer(new SubscribeCalibrateMagnetometerRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ProgressData> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              var result = reader.Current.CalibrationResult;
+              switch (result.Result)
+              {
+                case CalibrationResult.Types.Result.Success:
+                //case CalibrationResult.Types.Result.InProgress:
+                //case CalibrationResult.Types.Result.Instruction:
+                observer.OnNext(reader.Current.ProgressData);
+                break;
+                default:
+                observer.OnError(new CalibrationException(result.Result, result.ResultStr));
+                break;
+              }
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
+        }
+
+        public IObservable<ProgressData> CalibrateLevelHorizon()
+        {
+          return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateLevelHorizon(new SubscribeCalibrateLevelHorizonRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ProgressData> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              var result = reader.Current.CalibrationResult;
+              switch (result.Result)
+              {
+                case CalibrationResult.Types.Result.Success:
+                //case CalibrationResult.Types.Result.InProgress:
+                //case CalibrationResult.Types.Result.Instruction:
+                observer.OnNext(reader.Current.ProgressData);
+                break;
+                default:
+                observer.OnError(new CalibrationException(result.Result, result.ResultStr));
+                break;
+              }
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
         }
 
         public IObservable<ProgressData> CalibrateGimbalAccelerometer()
         {
-            return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateGimbalAccelerometer(new SubscribeCalibrateGimbalAccelerometerRequest()).ResponseStream,
-                reader => Observable.Create(
-                    async (IObserver<ProgressData> observer) =>
-                    {
-                        try
-                        {
-                            while (await reader.MoveNext())
-                            {
-                                var result = reader.Current.CalibrationResult;
-                                switch (result.Result)
-                                {
-                                    case CalibrationResult.Types.Result.Success:
-                                    case CalibrationResult.Types.Result.InProgress:
-                                    case CalibrationResult.Types.Result.Instruction:
-                                        observer.OnNext(reader.Current.ProgressData);
-                                        break;
-                                    default:
-                                        observer.OnError(new CalibrationException(result.Result, result.ResultStr));
-                                        break;
-                                }
-                            }
-                            observer.OnCompleted();
-                        }
-                        catch (Exception ex)
-                        {
-                            observer.OnError(ex);
-                        }
-                    }));
+          return Observable.Using(() => _calibrationServiceClient.SubscribeCalibrateGimbalAccelerometer(new SubscribeCalibrateGimbalAccelerometerRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ProgressData> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              var result = reader.Current.CalibrationResult;
+              switch (result.Result)
+              {
+                case CalibrationResult.Types.Result.Success:
+                //case CalibrationResult.Types.Result.InProgress:
+                //case CalibrationResult.Types.Result.Instruction:
+                observer.OnNext(reader.Current.ProgressData);
+                break;
+                default:
+                observer.OnError(new CalibrationException(result.Result, result.ResultStr));
+                break;
+              }
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
         }
 
         public IObservable<Unit> Cancel()
         {
-            return Observable.Create<Unit>(observer =>
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new CancelRequest();
+            var cancelResponse = _calibrationServiceClient.Cancel(request);
+            var calibrationResult = cancelResponse.CalibrationResult;
+            if (calibrationResult.Result == CalibrationResult.Types.Result.Success)
             {
-                var request = new CancelRequest();
-                _calibrationServiceClient.Cancel(request);
-                observer.OnCompleted();
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new CalibrationException(calibrationResult.Result, calibrationResult.ResultStr));
+            }
 
-                return Task.FromResult(Disposable.Empty);
-            });
+            return Task.FromResult(Disposable.Empty);
+          });
         }
-    }
+  }
 
-    public class CalibrationException : Exception
+  public class CalibrationException : Exception
+  {
+    public CalibrationResult.Types.Result Result { get; }
+    public string ResultStr { get; }
+
+    public CalibrationException(CalibrationResult.Types.Result result, string resultStr)
     {
-        public CalibrationResult.Types.Result Result { get; }
-        public string ResultStr { get; }
-
-        public CalibrationException(CalibrationResult.Types.Result result, string resultStr)
-        {
-            Result = result;
-            ResultStr = resultStr;
-        }
+      Result = result;
+      ResultStr = resultStr;
     }
+  }
 }

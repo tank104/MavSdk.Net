@@ -12,47 +12,175 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MAVSDK.Plugins
 {
-    public class Gimbal
-    {
-        private readonly GimbalService.GimbalServiceClient _gimbalServiceClient;
+  public class Gimbal
+  {
+    private readonly GimbalService.GimbalServiceClient _gimbalServiceClient;
 
-        internal Gimbal(Channel channel)
-        {
-            _gimbalServiceClient = new GimbalService.GimbalServiceClient(channel);
-        }
+    internal Gimbal(Channel channel)
+    {
+      _gimbalServiceClient = new GimbalService.GimbalServiceClient(channel);
+    }
 
         public IObservable<Unit> SetPitchAndYaw(float pitchDeg, float yawDeg)
         {
-            return Observable.Create<Unit>(observer =>
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new SetPitchAndYawRequest();
+            request.PitchDeg = pitchDeg;
+            request.YawDeg = yawDeg;
+            var setPitchAndYawResponse = _gimbalServiceClient.SetPitchAndYaw(request);
+            var gimbalResult = setPitchAndYawResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
             {
-                var request = new SetPitchAndYawRequest();
-                request.PitchDeg = pitchDeg;
-                request.YawDeg = yawDeg;
-                var setPitchAndYawResponse = _gimbalServiceClient.SetPitchAndYaw(request);
-                var gimbalResult = setPitchAndYawResponse.GimbalResult;
-                if (gimbalResult.Result == GimbalResult.Types.Result.Success)
-                {
-                    observer.OnCompleted();
-                }
-                else
-                {
-                    observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
-                }
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
 
-                return Task.FromResult(Disposable.Empty);
-            });
+            return Task.FromResult(Disposable.Empty);
+          });
         }
-    }
 
-    public class GimbalException : Exception
-    {
-        public GimbalResult.Types.Result Result { get; }
-        public string ResultStr { get; }
-
-        public GimbalException(GimbalResult.Types.Result result, string resultStr)
+        public IObservable<Unit> SetPitchRateAndYawRate(float pitchRateDegS, float yawRateDegS)
         {
-            Result = result;
-            ResultStr = resultStr;
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new SetPitchRateAndYawRateRequest();
+            request.PitchRateDegS = pitchRateDegS;
+            request.YawRateDegS = yawRateDegS;
+            var setPitchRateAndYawRateResponse = _gimbalServiceClient.SetPitchRateAndYawRate(request);
+            var gimbalResult = setPitchRateAndYawRateResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
+            {
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
+
+            return Task.FromResult(Disposable.Empty);
+          });
         }
+
+        public IObservable<Unit> SetMode(GimbalMode gimbalMode)
+        {
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new SetModeRequest();
+            request.GimbalMode = gimbalMode;
+            var setModeResponse = _gimbalServiceClient.SetMode(request);
+            var gimbalResult = setModeResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
+            {
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
+
+            return Task.FromResult(Disposable.Empty);
+          });
+        }
+
+        public IObservable<Unit> SetRoiLocation(double latitudeDeg, double longitudeDeg, float altitudeM)
+        {
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new SetRoiLocationRequest();
+            request.LatitudeDeg = latitudeDeg;
+            request.LongitudeDeg = longitudeDeg;
+            request.AltitudeM = altitudeM;
+            var setRoiLocationResponse = _gimbalServiceClient.SetRoiLocation(request);
+            var gimbalResult = setRoiLocationResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
+            {
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
+
+            return Task.FromResult(Disposable.Empty);
+          });
+        }
+
+        public IObservable<Unit> TakeControl(ControlMode controlMode)
+        {
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new TakeControlRequest();
+            request.ControlMode = controlMode;
+            var takeControlResponse = _gimbalServiceClient.TakeControl(request);
+            var gimbalResult = takeControlResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
+            {
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
+
+            return Task.FromResult(Disposable.Empty);
+          });
+        }
+
+        public IObservable<Unit> ReleaseControl()
+        {
+          return Observable.Create<Unit>(observer =>
+          {
+            var request = new ReleaseControlRequest();
+            var releaseControlResponse = _gimbalServiceClient.ReleaseControl(request);
+            var gimbalResult = releaseControlResponse.GimbalResult;
+            if (gimbalResult.Result == GimbalResult.Types.Result.Success)
+            {
+              observer.OnCompleted();
+            }
+            else
+            {
+              observer.OnError(new GimbalException(gimbalResult.Result, gimbalResult.ResultStr));
+            }
+
+            return Task.FromResult(Disposable.Empty);
+          });
+        }
+
+        public IObservable<ControlStatus> Control()
+        {
+          return Observable.Using(() => _gimbalServiceClient.SubscribeControl(new SubscribeControlRequest()).ResponseStream,
+          reader => Observable.Create(
+            async (IObserver<ControlStatus> observer) =>
+            {
+            try
+            {
+              while (await reader.MoveNext())
+              {
+              observer.OnNext(reader.Current.ControlStatus);
+              }
+              observer.OnCompleted();
+            }
+            catch (Exception ex)
+            {
+              observer.OnError(ex);
+            }
+            }));
+        }
+  }
+
+  public class GimbalException : Exception
+  {
+    public GimbalResult.Types.Result Result { get; }
+    public string ResultStr { get; }
+
+    public GimbalException(GimbalResult.Types.Result result, string resultStr)
+    {
+      Result = result;
+      ResultStr = resultStr;
     }
+  }
 }
