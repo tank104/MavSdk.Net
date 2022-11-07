@@ -12,32 +12,32 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MAVSDK.Plugins
 {
-    public class {{ plugin_name.upper_camel_case }}
-    {
-        private readonly {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient _{{ plugin_name.lower_camel_case }}ServiceClient;
+  public class {{ plugin_name.upper_camel_case }}
+  {
+    private readonly {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient _{{ plugin_name.lower_camel_case }}ServiceClient;
 
-        internal {{ plugin_name.upper_camel_case }}(Channel channel)
-        {
-            _{{ plugin_name.lower_camel_case }}ServiceClient = new {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient(channel);
-        }
+    internal {{ plugin_name.upper_camel_case }}(Channel channel)
+    {
+      _{{ plugin_name.lower_camel_case }}ServiceClient = new {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient(channel);
+    }
 
 {%- for method in methods %}
 
 {{ indent(method, 2) }}
 {%- endfor %}
-    }
+  }
 
-    {% if has_result -%}
-    public class {{ plugin_name.upper_camel_case }}Exception : Exception
+  {% if has_result -%}
+  public class {{ plugin_name.upper_camel_case }}Exception : Exception
+  {
+    public {{ plugin_name.upper_camel_case }}Result.Types.Result Result { get; }
+    public string ResultStr { get; }
+
+    public {{ plugin_name.upper_camel_case }}Exception({{ plugin_name.upper_camel_case }}Result.Types.Result result, string resultStr)
     {
-        public {{ plugin_name.upper_camel_case }}Result.Types.Result Result { get; }
-        public string ResultStr { get; }
-
-        public {{ plugin_name.upper_camel_case }}Exception({{ plugin_name.upper_camel_case }}Result.Types.Result result, string resultStr)
-        {
-            Result = result;
-            ResultStr = resultStr;
-        }
+      Result = result;
+      ResultStr = resultStr;
     }
-    {%- endif %}
+  }
+  {%- endif %}
 }
