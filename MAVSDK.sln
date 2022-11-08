@@ -5,16 +5,19 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAVSDK", "MAVSDK\MAVSDK.csproj", "{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAVSDK.CSharp.ConsoleClient", "MAVSDK.CSharp.ConsoleClient\MAVSDK.CSharp.ConsoleClient.csproj", "{3499D490-65B1-4EE2-98D5-D91A44F77D70}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{504A09DB-1DA8-4E56-B760-E271E08FD758}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\dotnet.yml = ..\.github\workflows\dotnet.yml
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{25E37F6E-ACA3-452C-8318-3242804E0F0E}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\GetBuildVersion.psm1 = ..\build\GetBuildVersion.psm1
+		build\GetBuildVersion.psm1 = build\GetBuildVersion.psm1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{55E1958C-1CC4-4587-92A9-1E1425BBF10D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
@@ -27,10 +30,6 @@ Global
 		{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3499D490-65B1-4EE2-98D5-D91A44F77D70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3499D490-65B1-4EE2-98D5-D91A44F77D70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3499D490-65B1-4EE2-98D5-D91A44F77D70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3499D490-65B1-4EE2-98D5-D91A44F77D70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,15 +1,21 @@
-# MAVSDK-CSharp
+# MAVSDK.NET
 MAVSDK client for C#. https://mavsdk.mavlink.io
 
+(Originally forked from https://github.com/mavlink/MAVSDK-CSharp)
+
 Things to still do:
+- [x] Add/Update latest proto
 - [x] Upgrade to Grpc.Net
+- [x] Remove console app, and restructure code to be library only
 - [ ] Add Unit Tests
-- [ ] Remove console app, and restructure code to be library only
-- [ ] Add more examples
 
-
-Example console application:
-```
+To get started:
+1. Download and run latest mavsdk_server_bin.exe (or other OS equivilent) from [MAVSDK Releases](https://github.com/mavlink/MAVSDK/releases) (this repo currently tested on v1.4.7).
+1. Run your Simulator and HITL/SITL (tested with [AirSim](https://github.com/tank104/AirSim) and [PX4](https://microsoft.github.io/AirSim/px4_sitl_wsl2/))
+1. Create a new .NET 6 project
+1. Install latest package `dotnet add package MAVSDK.NET --version x.x.x`
+1. Use example code below
+```cs
 using System;
 using System.Collections.Generic;
 using System.Reactive;
@@ -86,13 +92,9 @@ namespace MAVSDK.CSharp.ConsoleClient
       {
         missionItem = missionItem.Clone();
         if (i % 2 == 0)
-        {
           missionItem.LatitudeDeg += 0.0001;
-        }
         else
-        {
           missionItem.LatitudeDeg -= 0.0001;
-        }
 
         missionItem.LongitudeDeg += 0.0001;
         missionPlan.MissionItems.Add(missionItem);
@@ -102,4 +104,4 @@ namespace MAVSDK.CSharp.ConsoleClient
     }
   }
 }
-``
+```
