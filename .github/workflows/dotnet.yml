@@ -17,7 +17,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'MAVSDK-CSharp/MAVSDK-CSharp.sln'
+      SOLUTION: 'MAVSDK.sln'
 
     runs-on: ubuntu-latest
 
