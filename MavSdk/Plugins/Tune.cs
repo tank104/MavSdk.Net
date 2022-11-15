@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Tune
+  public class Tune : ITune
   {
     private readonly TuneService.TuneServiceClient _tuneServiceClient;
 
@@ -22,26 +22,26 @@ namespace MavSdk.Plugins
       _tuneServiceClient = new TuneService.TuneServiceClient(channel);
     }
 
-        public IObservable<Unit> PlayTune(TuneDescription tuneDescription)
+    public IObservable<Unit> PlayTune(TuneDescription tuneDescription)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new PlayTuneRequest();
+        request.TuneDescription = tuneDescription;
+        var playTuneResponse = _tuneServiceClient.PlayTune(request);
+        var tuneResult = playTuneResponse.TuneResult;
+        if (tuneResult.Result == TuneResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new PlayTuneRequest();
-            request.TuneDescription = tuneDescription;
-            var playTuneResponse = _tuneServiceClient.PlayTune(request);
-            var tuneResult = playTuneResponse.TuneResult;
-            if (tuneResult.Result == TuneResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new TuneException(tuneResult.Result, tuneResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new TuneException(tuneResult.Result, tuneResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class TuneException : Exception

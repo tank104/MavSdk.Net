@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Geofence
+  public class Geofence : IGeofence
   {
     private readonly GeofenceService.GeofenceServiceClient _geofenceServiceClient;
 
@@ -22,46 +22,46 @@ namespace MavSdk.Plugins
       _geofenceServiceClient = new GeofenceService.GeofenceServiceClient(channel);
     }
 
-        public IObservable<Unit> UploadGeofence(List<Polygon> polygons)
+    public IObservable<Unit> UploadGeofence(List<Polygon> polygons)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new UploadGeofenceRequest();
+        request.Polygons.AddRange(polygons);
+        var uploadGeofenceResponse = _geofenceServiceClient.UploadGeofence(request);
+        var geofenceResult = uploadGeofenceResponse.GeofenceResult;
+        if (geofenceResult.Result == GeofenceResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new UploadGeofenceRequest();
-            request.Polygons.AddRange(polygons);
-            var uploadGeofenceResponse = _geofenceServiceClient.UploadGeofence(request);
-            var geofenceResult = uploadGeofenceResponse.GeofenceResult;
-            if (geofenceResult.Result == GeofenceResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new GeofenceException(geofenceResult.Result, geofenceResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new GeofenceException(geofenceResult.Result, geofenceResult.ResultStr));
         }
 
-        public IObservable<Unit> ClearGeofence()
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new ClearGeofenceRequest();
-            var clearGeofenceResponse = _geofenceServiceClient.ClearGeofence(request);
-            var geofenceResult = clearGeofenceResponse.GeofenceResult;
-            if (geofenceResult.Result == GeofenceResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new GeofenceException(geofenceResult.Result, geofenceResult.ResultStr));
-            }
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Unit> ClearGeofence()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new ClearGeofenceRequest();
+        var clearGeofenceResponse = _geofenceServiceClient.ClearGeofence(request);
+        var geofenceResult = clearGeofenceResponse.GeofenceResult;
+        if (geofenceResult.Result == GeofenceResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new GeofenceException(geofenceResult.Result, geofenceResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class GeofenceException : Exception

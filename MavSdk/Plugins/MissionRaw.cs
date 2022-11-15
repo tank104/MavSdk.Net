@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class MissionRaw
+  public class MissionRaw : IMissionRaw
   {
     private readonly MissionRawService.MissionRawServiceClient _missionRawServiceClient;
 
@@ -22,234 +22,234 @@ namespace MavSdk.Plugins
       _missionRawServiceClient = new MissionRawService.MissionRawServiceClient(channel);
     }
 
-        public IObservable<Unit> UploadMission(List<MissionItem> missionItems)
+    public IObservable<Unit> UploadMission(List<MissionItem> missionItems)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new UploadMissionRequest();
+        request.MissionItems.AddRange(missionItems);
+        var uploadMissionResponse = _missionRawServiceClient.UploadMission(request);
+        var missionRawResult = uploadMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new UploadMissionRequest();
-            request.MissionItems.AddRange(missionItems);
-            var uploadMissionResponse = _missionRawServiceClient.UploadMission(request);
-            var missionRawResult = uploadMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
         }
 
-        public IObservable<Unit> CancelMissionUpload()
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new CancelMissionUploadRequest();
-            var cancelMissionUploadResponse = _missionRawServiceClient.CancelMissionUpload(request);
-            var missionRawResult = cancelMissionUploadResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Unit> CancelMissionUpload()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new CancelMissionUploadRequest();
+        var cancelMissionUploadResponse = _missionRawServiceClient.CancelMissionUpload(request);
+        var missionRawResult = cancelMissionUploadResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
         }
 
-        public IObservable<List<MissionItem>> DownloadMission()
-        {
-          return Observable.Create<List<MissionItem>>(observer =>
-          {
-            var request = new DownloadMissionRequest();
-            var downloadMissionResponse = _missionRawServiceClient.DownloadMission(request);
-            var missionRawResult = downloadMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnNext(downloadMissionResponse.MissionItems.ToList());
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
+    public IObservable<List<MissionItem>> DownloadMission()
+    {
+      return Observable.Create<List<MissionItem>>(observer =>
+      {
+        var request = new DownloadMissionRequest();
+        var downloadMissionResponse = _missionRawServiceClient.DownloadMission(request);
+        var missionRawResult = downloadMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnNext(downloadMissionResponse.MissionItems.ToList());
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> CancelMissionDownload()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new CancelMissionDownloadRequest();
+        var cancelMissionDownloadResponse = _missionRawServiceClient.CancelMissionDownload(request);
+        var missionRawResult = cancelMissionDownloadResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> StartMission()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new StartMissionRequest();
+        var startMissionResponse = _missionRawServiceClient.StartMission(request);
+        var missionRawResult = startMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> PauseMission()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new PauseMissionRequest();
+        var pauseMissionResponse = _missionRawServiceClient.PauseMission(request);
+        var missionRawResult = pauseMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> ClearMission()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new ClearMissionRequest();
+        var clearMissionResponse = _missionRawServiceClient.ClearMission(request);
+        var missionRawResult = clearMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> SetCurrentMissionItem(int index)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetCurrentMissionItemRequest();
+        request.Index = index;
+        var setCurrentMissionItemResponse = _missionRawServiceClient.SetCurrentMissionItem(request);
+        var missionRawResult = setCurrentMissionItemResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<MissionProgress> MissionProgress()
+    {
+      return Observable.Using(() => _missionRawServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()),
+      reader => Observable.Create(
+        async (IObserver<MissionProgress> observer) =>
+        {
+          try
+          {
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+            {
+              observer.OnNext(reader.ResponseStream.Current.MissionProgress);
+            }
             observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<Unit> CancelMissionDownload()
-        {
-          return Observable.Create<Unit>(observer =>
+          }
+          catch (Exception ex)
           {
-            var request = new CancelMissionDownloadRequest();
-            var cancelMissionDownloadResponse = _missionRawServiceClient.CancelMissionDownload(request);
-            var missionRawResult = cancelMissionDownloadResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+            observer.OnError(ex);
+          }
         }
+      ));
+    }
 
-        public IObservable<Unit> StartMission()
+    public IObservable<bool> MissionChanged()
+    {
+      return Observable.Using(() => _missionRawServiceClient.SubscribeMissionChanged(new SubscribeMissionChangedRequest()),
+      reader => Observable.Create(
+        async (IObserver<bool> observer) =>
         {
-          return Observable.Create<Unit>(observer =>
+          try
           {
-            var request = new StartMissionRequest();
-            var startMissionResponse = _missionRawServiceClient.StartMission(request);
-            var missionRawResult = startMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
             {
-              observer.OnCompleted();
+              observer.OnNext(reader.ResponseStream.Current.MissionChanged);
             }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<Unit> PauseMission()
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new PauseMissionRequest();
-            var pauseMissionResponse = _missionRawServiceClient.PauseMission(request);
-            var missionRawResult = pauseMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<Unit> ClearMission()
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new ClearMissionRequest();
-            var clearMissionResponse = _missionRawServiceClient.ClearMission(request);
-            var missionRawResult = clearMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<Unit> SetCurrentMissionItem(int index)
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new SetCurrentMissionItemRequest();
-            request.Index = index;
-            var setCurrentMissionItemResponse = _missionRawServiceClient.SetCurrentMissionItem(request);
-            var missionRawResult = setCurrentMissionItemResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<MissionProgress> MissionProgress()
-        {
-          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionProgress(new SubscribeMissionProgressRequest()),
-          reader => Observable.Create(
-            async (IObserver<MissionProgress> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.MissionProgress);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
-
-        public IObservable<bool> MissionChanged()
-        {
-          return Observable.Using(() => _missionRawServiceClient.SubscribeMissionChanged(new SubscribeMissionChangedRequest()),
-          reader => Observable.Create(
-            async (IObserver<bool> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.MissionChanged);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
-
-        public IObservable<MissionImportData> ImportQgroundcontrolMission(string qgcPlanPath)
-        {
-          return Observable.Create<MissionImportData>(observer =>
-          {
-            var request = new ImportQgroundcontrolMissionRequest();
-            request.QgcPlanPath = qgcPlanPath;
-            var importQgroundcontrolMissionResponse = _missionRawServiceClient.ImportQgroundcontrolMission(request);
-            var missionRawResult = importQgroundcontrolMissionResponse.MissionRawResult;
-            if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
-            {
-              observer.OnNext(importQgroundcontrolMissionResponse.MissionImportData);
-            }
-            else
-            {
-              observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
-            }
-
             observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
+      ));
+    }
+
+    public IObservable<MissionImportData> ImportQgroundcontrolMission(string qgcPlanPath)
+    {
+      return Observable.Create<MissionImportData>(observer =>
+      {
+        var request = new ImportQgroundcontrolMissionRequest();
+        request.QgcPlanPath = qgcPlanPath;
+        var importQgroundcontrolMissionResponse = _missionRawServiceClient.ImportQgroundcontrolMission(request);
+        var missionRawResult = importQgroundcontrolMissionResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnNext(importQgroundcontrolMissionResponse.MissionImportData);
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class MissionRawException : Exception

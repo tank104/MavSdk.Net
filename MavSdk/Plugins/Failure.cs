@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Failure
+  public class Failure : IFailure
   {
     private readonly FailureService.FailureServiceClient _failureServiceClient;
 
@@ -22,28 +22,28 @@ namespace MavSdk.Plugins
       _failureServiceClient = new FailureService.FailureServiceClient(channel);
     }
 
-        public IObservable<Unit> Inject(FailureUnit failureUnit, FailureType failureType, int instance)
+    public IObservable<Unit> Inject(FailureUnit failureUnit, FailureType failureType, int instance)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new InjectRequest();
+        request.FailureUnit = failureUnit;
+        request.FailureType = failureType;
+        request.Instance = instance;
+        var injectResponse = _failureServiceClient.Inject(request);
+        var failureResult = injectResponse.FailureResult;
+        if (failureResult.Result == FailureResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new InjectRequest();
-            request.FailureUnit = failureUnit;
-            request.FailureType = failureType;
-            request.Instance = instance;
-            var injectResponse = _failureServiceClient.Inject(request);
-            var failureResult = injectResponse.FailureResult;
-            if (failureResult.Result == FailureResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new FailureException(failureResult.Result, failureResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new FailureException(failureResult.Result, failureResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class FailureException : Exception

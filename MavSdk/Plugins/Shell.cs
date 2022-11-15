@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Shell
+  public class Shell : IShell
   {
     private readonly ShellService.ShellServiceClient _shellServiceClient;
 
@@ -22,48 +22,48 @@ namespace MavSdk.Plugins
       _shellServiceClient = new ShellService.ShellServiceClient(channel);
     }
 
-        public IObservable<Unit> Send(string command)
+    public IObservable<Unit> Send(string command)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SendRequest();
+        request.Command = command;
+        var sendResponse = _shellServiceClient.Send(request);
+        var shellResult = sendResponse.ShellResult;
+        if (shellResult.Result == ShellResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new ShellException(shellResult.Result, shellResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<string> Receive()
+    {
+      return Observable.Using(() => _shellServiceClient.SubscribeReceive(new SubscribeReceiveRequest()),
+      reader => Observable.Create(
+        async (IObserver<string> observer) =>
+        {
+          try
           {
-            var request = new SendRequest();
-            request.Command = command;
-            var sendResponse = _shellServiceClient.Send(request);
-            var shellResult = sendResponse.ShellResult;
-            if (shellResult.Result == ShellResult.Types.Result.Success)
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
             {
-              observer.OnCompleted();
+              observer.OnNext(reader.ResponseStream.Current.Data);
             }
-            else
-            {
-              observer.OnError(new ShellException(shellResult.Result, shellResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
-
-        public IObservable<string> Receive()
-        {
-          return Observable.Using(() => _shellServiceClient.SubscribeReceive(new SubscribeReceiveRequest()),
-          reader => Observable.Create(
-            async (IObserver<string> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.Data);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
+      ));
+    }
   }
 
   public class ShellException : Exception

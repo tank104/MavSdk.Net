@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Info
+  public class Info : IInfo
   {
     private readonly InfoService.InfoServiceClient _infoServiceClient;
 
@@ -22,110 +22,110 @@ namespace MavSdk.Plugins
       _infoServiceClient = new InfoService.InfoServiceClient(channel);
     }
 
-        public IObservable<FlightInfo> GetFlightInformation()
+    public IObservable<FlightInfo> GetFlightInformation()
+    {
+      return Observable.Create<FlightInfo>(observer =>
+      {
+        var request = new GetFlightInformationRequest();
+        var getFlightInformationResponse = _infoServiceClient.GetFlightInformation(request);
+        var infoResult = getFlightInformationResponse.InfoResult;
+        if (infoResult.Result == InfoResult.Types.Result.Success)
         {
-          return Observable.Create<FlightInfo>(observer =>
-          {
-            var request = new GetFlightInformationRequest();
-            var getFlightInformationResponse = _infoServiceClient.GetFlightInformation(request);
-            var infoResult = getFlightInformationResponse.InfoResult;
-            if (infoResult.Result == InfoResult.Types.Result.Success)
-            {
-              observer.OnNext(getFlightInformationResponse.FlightInfo);
-            }
-            else
-            {
-              observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
-            }
-
-            observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnNext(getFlightInformationResponse.FlightInfo);
+        }
+        else
+        {
+          observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
         }
 
-        public IObservable<Identification> GetIdentification()
-        {
-          return Observable.Create<Identification>(observer =>
-          {
-            var request = new GetIdentificationRequest();
-            var getIdentificationResponse = _infoServiceClient.GetIdentification(request);
-            var infoResult = getIdentificationResponse.InfoResult;
-            if (infoResult.Result == InfoResult.Types.Result.Success)
-            {
-              observer.OnNext(getIdentificationResponse.Identification);
-            }
-            else
-            {
-              observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
-            }
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Identification> GetIdentification()
+    {
+      return Observable.Create<Identification>(observer =>
+      {
+        var request = new GetIdentificationRequest();
+        var getIdentificationResponse = _infoServiceClient.GetIdentification(request);
+        var infoResult = getIdentificationResponse.InfoResult;
+        if (infoResult.Result == InfoResult.Types.Result.Success)
+        {
+          observer.OnNext(getIdentificationResponse.Identification);
+        }
+        else
+        {
+          observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
         }
 
-        public IObservable<Product> GetProduct()
-        {
-          return Observable.Create<Product>(observer =>
-          {
-            var request = new GetProductRequest();
-            var getProductResponse = _infoServiceClient.GetProduct(request);
-            var infoResult = getProductResponse.InfoResult;
-            if (infoResult.Result == InfoResult.Types.Result.Success)
-            {
-              observer.OnNext(getProductResponse.Product);
-            }
-            else
-            {
-              observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
-            }
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Product> GetProduct()
+    {
+      return Observable.Create<Product>(observer =>
+      {
+        var request = new GetProductRequest();
+        var getProductResponse = _infoServiceClient.GetProduct(request);
+        var infoResult = getProductResponse.InfoResult;
+        if (infoResult.Result == InfoResult.Types.Result.Success)
+        {
+          observer.OnNext(getProductResponse.Product);
+        }
+        else
+        {
+          observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
         }
 
-        public IObservable<Version> GetVersion()
-        {
-          return Observable.Create<Version>(observer =>
-          {
-            var request = new GetVersionRequest();
-            var getVersionResponse = _infoServiceClient.GetVersion(request);
-            var infoResult = getVersionResponse.InfoResult;
-            if (infoResult.Result == InfoResult.Types.Result.Success)
-            {
-              observer.OnNext(getVersionResponse.Version);
-            }
-            else
-            {
-              observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
-            }
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Version> GetVersion()
+    {
+      return Observable.Create<Version>(observer =>
+      {
+        var request = new GetVersionRequest();
+        var getVersionResponse = _infoServiceClient.GetVersion(request);
+        var infoResult = getVersionResponse.InfoResult;
+        if (infoResult.Result == InfoResult.Types.Result.Success)
+        {
+          observer.OnNext(getVersionResponse.Version);
+        }
+        else
+        {
+          observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
         }
 
-        public IObservable<double> GetSpeedFactor()
-        {
-          return Observable.Create<double>(observer =>
-          {
-            var request = new GetSpeedFactorRequest();
-            var getSpeedFactorResponse = _infoServiceClient.GetSpeedFactor(request);
-            var infoResult = getSpeedFactorResponse.InfoResult;
-            if (infoResult.Result == InfoResult.Types.Result.Success)
-            {
-              observer.OnNext(getSpeedFactorResponse.SpeedFactor);
-            }
-            else
-            {
-              observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
-            }
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<double> GetSpeedFactor()
+    {
+      return Observable.Create<double>(observer =>
+      {
+        var request = new GetSpeedFactorRequest();
+        var getSpeedFactorResponse = _infoServiceClient.GetSpeedFactor(request);
+        var infoResult = getSpeedFactorResponse.InfoResult;
+        if (infoResult.Result == InfoResult.Types.Result.Success)
+        {
+          observer.OnNext(getSpeedFactorResponse.SpeedFactor);
         }
+        else
+        {
+          observer.OnError(new InfoException(infoResult.Result, infoResult.ResultStr));
+        }
+
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class InfoException : Exception

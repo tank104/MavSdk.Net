@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class ComponentInformationServer
+  public class ComponentInformationServer : IComponentInformationServer
   {
     private readonly ComponentInformationServerService.ComponentInformationServerServiceClient _componentInformationServerServiceClient;
 
@@ -22,48 +22,48 @@ namespace MavSdk.Plugins
       _componentInformationServerServiceClient = new ComponentInformationServerService.ComponentInformationServerServiceClient(channel);
     }
 
-        public IObservable<Unit> ProvideFloatParam(FloatParam param)
+    public IObservable<Unit> ProvideFloatParam(FloatParam param)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new ProvideFloatParamRequest();
+        request.Param = param;
+        var provideFloatParamResponse = _componentInformationServerServiceClient.ProvideFloatParam(request);
+        var componentInformationServerResult = provideFloatParamResponse.ComponentInformationServerResult;
+        if (componentInformationServerResult.Result == ComponentInformationServerResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new ComponentInformationServerException(componentInformationServerResult.Result, componentInformationServerResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<FloatParamUpdate> FloatParam()
+    {
+      return Observable.Using(() => _componentInformationServerServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()),
+      reader => Observable.Create(
+        async (IObserver<FloatParamUpdate> observer) =>
+        {
+          try
           {
-            var request = new ProvideFloatParamRequest();
-            request.Param = param;
-            var provideFloatParamResponse = _componentInformationServerServiceClient.ProvideFloatParam(request);
-            var componentInformationServerResult = provideFloatParamResponse.ComponentInformationServerResult;
-            if (componentInformationServerResult.Result == ComponentInformationServerResult.Types.Result.Success)
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
             {
-              observer.OnCompleted();
+              observer.OnNext(reader.ResponseStream.Current.ParamUpdate);
             }
-            else
-            {
-              observer.OnError(new ComponentInformationServerException(componentInformationServerResult.Result, componentInformationServerResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
-
-        public IObservable<FloatParamUpdate> FloatParam()
-        {
-          return Observable.Using(() => _componentInformationServerServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()),
-          reader => Observable.Create(
-            async (IObserver<FloatParamUpdate> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.ParamUpdate);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
+      ));
+    }
   }
 
   public class ComponentInformationServerException : Exception

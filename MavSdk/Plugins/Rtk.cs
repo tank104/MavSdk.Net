@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Rtk
+  public class Rtk : IRtk
   {
     private readonly RtkService.RtkServiceClient _rtkServiceClient;
 
@@ -22,26 +22,26 @@ namespace MavSdk.Plugins
       _rtkServiceClient = new RtkService.RtkServiceClient(channel);
     }
 
-        public IObservable<Unit> SendRtcmData(RtcmData rtcmData)
+    public IObservable<Unit> SendRtcmData(RtcmData rtcmData)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SendRtcmDataRequest();
+        request.RtcmData = rtcmData;
+        var sendRtcmDataResponse = _rtkServiceClient.SendRtcmData(request);
+        var rtkResult = sendRtcmDataResponse.RtkResult;
+        if (rtkResult.Result == RtkResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new SendRtcmDataRequest();
-            request.RtcmData = rtcmData;
-            var sendRtcmDataResponse = _rtkServiceClient.SendRtcmData(request);
-            var rtkResult = sendRtcmDataResponse.RtkResult;
-            if (rtkResult.Result == RtkResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new RtkException(rtkResult.Result, rtkResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new RtkException(rtkResult.Result, rtkResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class RtkException : Exception

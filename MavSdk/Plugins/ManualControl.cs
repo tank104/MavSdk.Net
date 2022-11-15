@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class ManualControl
+  public class ManualControl : IManualControl
   {
     private readonly ManualControlService.ManualControlServiceClient _manualControlServiceClient;
 
@@ -22,69 +22,69 @@ namespace MavSdk.Plugins
       _manualControlServiceClient = new ManualControlService.ManualControlServiceClient(channel);
     }
 
-        public IObservable<Unit> StartPositionControl()
+    public IObservable<Unit> StartPositionControl()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new StartPositionControlRequest();
+        var startPositionControlResponse = _manualControlServiceClient.StartPositionControl(request);
+        var manualControlResult = startPositionControlResponse.ManualControlResult;
+        if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new StartPositionControlRequest();
-            var startPositionControlResponse = _manualControlServiceClient.StartPositionControl(request);
-            var manualControlResult = startPositionControlResponse.ManualControlResult;
-            if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
         }
 
-        public IObservable<Unit> StartAltitudeControl()
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new StartAltitudeControlRequest();
-            var startAltitudeControlResponse = _manualControlServiceClient.StartAltitudeControl(request);
-            var manualControlResult = startAltitudeControlResponse.ManualControlResult;
-            if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
-            }
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Unit> StartAltitudeControl()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new StartAltitudeControlRequest();
+        var startAltitudeControlResponse = _manualControlServiceClient.StartAltitudeControl(request);
+        var manualControlResult = startAltitudeControlResponse.ManualControlResult;
+        if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
         }
 
-        public IObservable<Unit> SetManualControlInput(float x, float y, float z, float r)
-        {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new SetManualControlInputRequest();
-            request.X = x;
-            request.Y = y;
-            request.Z = z;
-            request.R = r;
-            var setManualControlInputResponse = _manualControlServiceClient.SetManualControlInput(request);
-            var manualControlResult = setManualControlInputResponse.ManualControlResult;
-            if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
-            }
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
 
-            return Task.FromResult(Disposable.Empty);
-          });
+    public IObservable<Unit> SetManualControlInput(float x, float y, float z, float r)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetManualControlInputRequest();
+        request.X = x;
+        request.Y = y;
+        request.Z = z;
+        request.R = r;
+        var setManualControlInputResponse = _manualControlServiceClient.SetManualControlInput(request);
+        var manualControlResult = setManualControlInputResponse.ManualControlResult;
+        if (manualControlResult.Result == ManualControlResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new ManualControlException(manualControlResult.Result, manualControlResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class ManualControlException : Exception

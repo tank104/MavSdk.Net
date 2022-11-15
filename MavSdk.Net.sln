@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MavSdk3", "MavSdk\MavSdk3.csproj", "{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MavSdk", "MavSdk\MavSdk.csproj", "{2CE4FA33-5FE3-4E43-AEA9-6D60C1B916D0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{504A09DB-1DA8-4E56-B760-E271E08FD758}"
 	ProjectSection(SolutionItems) = preProject

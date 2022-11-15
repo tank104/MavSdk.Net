@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class MissionRawServer
+  public class MissionRawServer : IMissionRawServer
   {
     private readonly MissionRawServerService.MissionRawServerServiceClient _missionRawServerServiceClient;
 
@@ -22,94 +22,94 @@ namespace MavSdk.Plugins
       _missionRawServerServiceClient = new MissionRawServerService.MissionRawServerServiceClient(channel);
     }
 
-        public IObservable<MissionPlan> IncomingMission()
+    public IObservable<MissionPlan> IncomingMission()
+    {
+      return Observable.Using(() => _missionRawServerServiceClient.SubscribeIncomingMission(new SubscribeIncomingMissionRequest()),
+      reader => Observable.Create(
+        async (IObserver<MissionPlan> observer) =>
         {
-          return Observable.Using(() => _missionRawServerServiceClient.SubscribeIncomingMission(new SubscribeIncomingMissionRequest()),
-          reader => Observable.Create(
-            async (IObserver<MissionPlan> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  var result = reader.ResponseStream.Current.MissionRawServerResult;
-                  switch (result.Result)
-                  {
-                    case MissionRawServerResult.Types.Result.Success:
-                    //case MissionRawServerResult.Types.Result.InProgress:
-                    //case MissionRawServerResult.Types.Result.Instruction:
-                    observer.OnNext(reader.ResponseStream.Current.MissionPlan);
-                    break;
-                    default:
-                    observer.OnError(new MissionRawServerException(result.Result, result.ResultStr));
-                    break;
-                  }
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
-
-        public IObservable<MissionItem> CurrentItemChanged()
-        {
-          return Observable.Using(() => _missionRawServerServiceClient.SubscribeCurrentItemChanged(new SubscribeCurrentItemChangedRequest()),
-          reader => Observable.Create(
-            async (IObserver<MissionItem> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.MissionItem);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
-
-        public IObservable<Unit> SetCurrentItemComplete()
-        {
-          return Observable.Create<Unit>(observer =>
+          try
           {
-            var request = new SetCurrentItemCompleteRequest();
-            _missionRawServerServiceClient.SetCurrentItemComplete(request);
-            observer.OnCompleted();
-
-            return Task.FromResult(Disposable.Empty);
-          });
-        }
-
-        public IObservable<uint> ClearAll()
-        {
-          return Observable.Using(() => _missionRawServerServiceClient.SubscribeClearAll(new SubscribeClearAllRequest()),
-          reader => Observable.Create(
-            async (IObserver<uint> observer) =>
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
             {
-              try
+              var result = reader.ResponseStream.Current.MissionRawServerResult;
+              switch (result.Result)
               {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.ClearType);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
+                case MissionRawServerResult.Types.Result.Success:
+                //case MissionRawServerResult.Types.Result.InProgress:
+                //case MissionRawServerResult.Types.Result.Instruction:
+                observer.OnNext(reader.ResponseStream.Current.MissionPlan);
+                break;
+                default:
+                observer.OnError(new MissionRawServerException(result.Result, result.ResultStr));
+                break;
               }
             }
-          ));
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
+      ));
+    }
+
+    public IObservable<MissionItem> CurrentItemChanged()
+    {
+      return Observable.Using(() => _missionRawServerServiceClient.SubscribeCurrentItemChanged(new SubscribeCurrentItemChangedRequest()),
+      reader => Observable.Create(
+        async (IObserver<MissionItem> observer) =>
+        {
+          try
+          {
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+            {
+              observer.OnNext(reader.ResponseStream.Current.MissionItem);
+            }
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
+        }
+      ));
+    }
+
+    public IObservable<Unit> SetCurrentItemComplete()
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetCurrentItemCompleteRequest();
+        _missionRawServerServiceClient.SetCurrentItemComplete(request);
+        observer.OnCompleted();
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<uint> ClearAll()
+    {
+      return Observable.Using(() => _missionRawServerServiceClient.SubscribeClearAll(new SubscribeClearAllRequest()),
+      reader => Observable.Create(
+        async (IObserver<uint> observer) =>
+        {
+          try
+          {
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+            {
+              observer.OnNext(reader.ResponseStream.Current.ClearType);
+            }
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
+        }
+      ));
+    }
   }
 
   public class MissionRawServerException : Exception

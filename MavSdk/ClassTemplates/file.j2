@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class {{ plugin_name.upper_camel_case }}
+  public class {{ plugin_name.upper_camel_case }} : I{{ plugin_name.upper_camel_case }}
   {
     private readonly {{ plugin_name.upper_camel_case }}Service.{{ plugin_name.upper_camel_case }}ServiceClient _{{ plugin_name.lower_camel_case }}ServiceClient;
 
@@ -24,7 +24,7 @@ namespace MavSdk.Plugins
 
 {%- for method in methods %}
 
-{{ indent(method, 2) }}
+{{ indent(method, 1) }}
 {%- endfor %}
   }
 

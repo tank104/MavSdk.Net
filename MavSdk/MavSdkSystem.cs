@@ -1,7 +1,6 @@
 ﻿using System;
 using Grpc.Net.Client;
 using MavSdk.Plugins;
-using Action = MavSdk.Plugins.Action;
 
 namespace MavSdk
 {
@@ -13,7 +12,7 @@ namespace MavSdk
     {
       _channel = GrpcChannel.ForAddress(address);
 
-      Action = new Action(_channel);
+      Action = new Plugins.Action(_channel);
       ActionServer = new ActionServer(_channel);
       Calibration = new Calibration(_channel);
       Camera = new Camera(_channel);
@@ -49,36 +48,65 @@ namespace MavSdk
 
     #region Public Properties
 
-    public Action Action { get; }
-    public ActionServer ActionServer { get; }
-    public Calibration Calibration { get; }
-    public Camera Camera { get; }
-    public ComponentInformation ComponentInformation { get; }
-    public ComponentInformationServer ComponentInformationServer { get; }
-    public Core Core { get; }
-    public Failure Failure { get; }
-    public FollowMe FollowMe { get; }
-    public Ftp Ftp { get; }
-    public Geofence Geofence { get; }
-    public Gimbal Gimbal { get; }
-    public Info Info { get; }
-    public LogFiles LogFiles { get; }
-    public ManualControl ManualControl { get; }
-    public Mission Mission { get; }
-    public MissionRaw MissionRaw { get; }
-    public MissionRawServer MissionRawServer { get; }
-    public Mocap Mocap { get; }
-    public Offboard Offboard { get; }
-    public Param Param { get; }
-    public ParamServer ParamServer { get; }
-    public Rtk Rtk { get; }
-    public ServerUtility ServerUtility { get; }
-    public Shell Shell { get; }
-    public Telemetry Telemetry { get; }
-    public TelemetryServer TelemetryServer { get; }
-    public TrackingServer TrackingServer { get; }
-    public Transponder Transponder { get; }
-    public Tune Tune { get; }
+    public IAction Action { get; }
+
+    public IActionServer ActionServer { get; }
+
+    public ICalibration Calibration { get; }
+
+    public ICamera Camera { get; }
+
+    public IComponentInformation ComponentInformation { get; }
+
+    public IComponentInformationServer ComponentInformationServer { get; }
+
+    public ICore Core { get; }
+
+    public IFailure Failure { get; }
+
+    public IFollowMe FollowMe { get; }
+
+    public IFtp Ftp { get; }
+
+    public IGeofence Geofence { get; }
+
+    public IGimbal Gimbal { get; }
+
+    public IInfo Info { get; }
+
+    public ILogFiles LogFiles { get; }
+
+    public IManualControl ManualControl { get; }
+
+    public IMission Mission { get; }
+
+    public IMissionRaw MissionRaw { get; }
+
+    public IMissionRawServer MissionRawServer { get; }
+
+    public IMocap Mocap { get; }
+
+    public IOffboard Offboard { get; }
+
+    public IParam Param { get; }
+
+    public IParamServer ParamServer { get; }
+
+    public IRtk Rtk { get; }
+
+    public IServerUtility ServerUtility { get; }
+
+    public IShell Shell { get; }
+
+    public ITelemetry Telemetry { get; }
+
+    public ITelemetryServer TelemetryServer { get; }
+
+    public ITrackingServer TrackingServer { get; }
+
+    public ITransponder Transponder { get; }
+
+    public ITune Tune { get; }
 
     #endregion
 

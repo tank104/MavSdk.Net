@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class ComponentInformation
+  public class ComponentInformation : IComponentInformation
   {
     private readonly ComponentInformationService.ComponentInformationServiceClient _componentInformationServiceClient;
 
@@ -22,48 +22,48 @@ namespace MavSdk.Plugins
       _componentInformationServiceClient = new ComponentInformationService.ComponentInformationServiceClient(channel);
     }
 
-        public IObservable<List<FloatParam>> AccessFloatParams()
+    public IObservable<List<FloatParam>> AccessFloatParams()
+    {
+      return Observable.Create<List<FloatParam>>(observer =>
+      {
+        var request = new AccessFloatParamsRequest();
+        var accessFloatParamsResponse = _componentInformationServiceClient.AccessFloatParams(request);
+        var componentInformationResult = accessFloatParamsResponse.ComponentInformationResult;
+        if (componentInformationResult.Result == ComponentInformationResult.Types.Result.Success)
         {
-          return Observable.Create<List<FloatParam>>(observer =>
+          observer.OnNext(accessFloatParamsResponse.Params.ToList());
+        }
+        else
+        {
+          observer.OnError(new ComponentInformationException(componentInformationResult.Result, componentInformationResult.ResultStr));
+        }
+
+        observer.OnCompleted();
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<FloatParamUpdate> FloatParam()
+    {
+      return Observable.Using(() => _componentInformationServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()),
+      reader => Observable.Create(
+        async (IObserver<FloatParamUpdate> observer) =>
+        {
+          try
           {
-            var request = new AccessFloatParamsRequest();
-            var accessFloatParamsResponse = _componentInformationServiceClient.AccessFloatParams(request);
-            var componentInformationResult = accessFloatParamsResponse.ComponentInformationResult;
-            if (componentInformationResult.Result == ComponentInformationResult.Types.Result.Success)
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
             {
-              observer.OnNext(accessFloatParamsResponse.Params.ToList());
+              observer.OnNext(reader.ResponseStream.Current.ParamUpdate);
             }
-            else
-            {
-              observer.OnError(new ComponentInformationException(componentInformationResult.Result, componentInformationResult.ResultStr));
-            }
-
             observer.OnCompleted();
-            return Task.FromResult(Disposable.Empty);
-          });
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
-
-        public IObservable<FloatParamUpdate> FloatParam()
-        {
-          return Observable.Using(() => _componentInformationServiceClient.SubscribeFloatParam(new SubscribeFloatParamRequest()),
-          reader => Observable.Create(
-            async (IObserver<FloatParamUpdate> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.ParamUpdate);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
+      ));
+    }
   }
 
   public class ComponentInformationException : Exception

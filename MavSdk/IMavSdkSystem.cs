@@ -7,65 +7,65 @@ namespace MavSdk
   {
     #region Public Properties
 
-    Plugins.Action Action { get; }
+    IAction Action { get; }
 
-    ActionServer ActionServer { get; }
+    IActionServer ActionServer { get; }
 
-    Calibration Calibration { get; }
+    ICalibration Calibration { get; }
 
-    Camera Camera { get; }
+    ICamera Camera { get; }
 
-    ComponentInformation ComponentInformation { get; }
+    IComponentInformation ComponentInformation { get; }
 
-    ComponentInformationServer ComponentInformationServer { get; }
+    IComponentInformationServer ComponentInformationServer { get; }
 
-    Core Core { get; }
+    ICore Core { get; }
 
-    Failure Failure { get; }
+    IFailure Failure { get; }
 
-    FollowMe FollowMe { get; }
+    IFollowMe FollowMe { get; }
 
-    Ftp Ftp { get; }
+    IFtp Ftp { get; }
 
-    Geofence Geofence { get; }
+    IGeofence Geofence { get; }
 
-    Gimbal Gimbal { get; }
+    IGimbal Gimbal { get; }
 
-    Info Info { get; }
+    IInfo Info { get; }
 
-    LogFiles LogFiles { get; }
+    ILogFiles LogFiles { get; }
 
-    ManualControl ManualControl { get; }
+    IManualControl ManualControl { get; }
 
-    Mission Mission { get; }
+    IMission Mission { get; }
 
-    MissionRaw MissionRaw { get; }
+    IMissionRaw MissionRaw { get; }
 
-    MissionRawServer MissionRawServer { get; }
+    IMissionRawServer MissionRawServer { get; }
 
-    Mocap Mocap { get; }
+    IMocap Mocap { get; }
 
-    Offboard Offboard { get; }
+    IOffboard Offboard { get; }
 
-    Param Param { get; }
+    IParam Param { get; }
 
-    ParamServer ParamServer { get; }
+    IParamServer ParamServer { get; }
 
-    Rtk Rtk { get; }
+    IRtk Rtk { get; }
 
-    ServerUtility ServerUtility { get; }
+    IServerUtility ServerUtility { get; }
 
-    Shell Shell { get; }
+    IShell Shell { get; }
 
-    Telemetry Telemetry { get; }
+    ITelemetry Telemetry { get; }
 
-    TelemetryServer TelemetryServer { get; }
+    ITelemetryServer TelemetryServer { get; }
 
-    TrackingServer TrackingServer { get; }
+    ITrackingServer TrackingServer { get; }
 
-    Transponder Transponder { get; }
+    ITransponder Transponder { get; }
 
-    Tune Tune { get; }
+    ITune Tune { get; }
 
     #endregion
   }

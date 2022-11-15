@@ -30,17 +30,26 @@ The libraries can be used onboard a drone on a companion computer or on the grou
 
   <Target Name="GenMavSdk">
     <PropertyGroup>
-        <ProtoCCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-custom=../proto/pb_plugins/venv/bin/protoc-gen-mavsdk --custom_opt=file_ext=cs,template_path=templates --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCCommand>
+      <ProtoCInterfaceCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-custom=../proto/pb_plugins/venv/bin/protoc-gen-mavsdk --custom_opt=file_ext=cs,template_path=InterfaceTemplates --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCInterfaceCommand>
+      <ProtoCClassCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-custom=../proto/pb_plugins/venv/bin/protoc-gen-mavsdk --custom_opt=file_ext=cs,template_path=ClassTemplates --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCClassCommand>
     </PropertyGroup>
-    <Message Importance="high" Text="$(ProtoCCommand)" />
-    <Exec Command="$(ProtoCCommand)" />
+    <Message Importance="high" Text="$(ProtoCInterfaceCommand)" />
+    <Exec Command="$(ProtoCInterfaceCommand)" />
+    <!--Not tested below in linux yet, basically needs to add I to start of all files since they are interfaces.-->
+    <Exec Command="FOR /r &quot;./Plugins&quot; %%a in (*.cs) DO REN &quot;%%~a&quot; &quot;I%%~nxa&quot;" />
+    <Message Importance="high" Text="$(ProtoCClassCommand)" />
+    <Exec Command="$(ProtoCClassCommand)" />
   </Target>
   <Target Name="GenMavSdkWin">
     <PropertyGroup>
-        <ProtoCCommand>protoc.exe --plugin=protoc-gen-custom=../proto/pb_plugins/venv/Scripts/protoc-gen-mavsdk.exe --custom_opt="file_ext=cs,template_path=templates" --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCCommand>
+        <ProtoCInterfaceCommand>protoc.exe --plugin=protoc-gen-custom=../proto/pb_plugins/venv/Scripts/protoc-gen-mavsdk.exe --custom_opt="file_ext=cs,template_path=InterfaceTemplates" --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCInterfaceCommand>
+        <ProtoCClassCommand>protoc.exe --plugin=protoc-gen-custom=../proto/pb_plugins/venv/Scripts/protoc-gen-mavsdk.exe --custom_opt="file_ext=cs,template_path=ClassTemplates" --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCClassCommand>
     </PropertyGroup>
-    <Message Importance="high" Text="$(ProtoCCommand)" />
-    <Exec Command="$(ProtoCCommand)" />
+    <Message Importance="high" Text="$(ProtoCInterfaceCommand)" />
+    <Exec Command="$(ProtoCInterfaceCommand)" />
+    <Exec Command="FOR /r &quot;./Plugins&quot; %%a in (*.cs) DO REN &quot;%%~a&quot; &quot;I%%~nxa&quot;" />
+    <Message Importance="high" Text="$(ProtoCClassCommand)" />
+    <Exec Command="$(ProtoCClassCommand)" />
   </Target>
   
   <ItemGroup>

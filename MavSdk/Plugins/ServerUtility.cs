@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class ServerUtility
+  public class ServerUtility : IServerUtility
   {
     private readonly ServerUtilityService.ServerUtilityServiceClient _serverUtilityServiceClient;
 
@@ -22,27 +22,27 @@ namespace MavSdk.Plugins
       _serverUtilityServiceClient = new ServerUtilityService.ServerUtilityServiceClient(channel);
     }
 
-        public IObservable<Unit> SendStatusText(StatusTextType type, string text)
+    public IObservable<Unit> SendStatusText(StatusTextType type, string text)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SendStatusTextRequest();
+        request.Type = type;
+        request.Text = text;
+        var sendStatusTextResponse = _serverUtilityServiceClient.SendStatusText(request);
+        var serverUtilityResult = sendStatusTextResponse.ServerUtilityResult;
+        if (serverUtilityResult.Result == ServerUtilityResult.Types.Result.Success)
         {
-          return Observable.Create<Unit>(observer =>
-          {
-            var request = new SendStatusTextRequest();
-            request.Type = type;
-            request.Text = text;
-            var sendStatusTextResponse = _serverUtilityServiceClient.SendStatusText(request);
-            var serverUtilityResult = sendStatusTextResponse.ServerUtilityResult;
-            if (serverUtilityResult.Result == ServerUtilityResult.Types.Result.Success)
-            {
-              observer.OnCompleted();
-            }
-            else
-            {
-              observer.OnError(new ServerUtilityException(serverUtilityResult.Result, serverUtilityResult.ResultStr));
-            }
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          observer.OnCompleted();
         }
+        else
+        {
+          observer.OnError(new ServerUtilityException(serverUtilityResult.Result, serverUtilityResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   public class ServerUtilityException : Exception

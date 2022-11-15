@@ -1,13 +1,13 @@
 ## Generate code from proto files
 
-Most of the code is auto-generated from the proto files, versioned and kept in _Plugins/_. Whenever the templates or proto files change, they need to be generated again. This requires `protoc-gen-mavsdk` to be available in `../../proto/pb_plugins/venv/bin/protoc-gen-mavsdk`.
+Most of the code is auto-generated from the proto files, versioned and kept in _Plugins/_. Whenever the templates or proto files change, they need to be generated again. This requires `protoc-gen-mavsdk` to be available in `../proto/pb_plugins/venv/bin/protoc-gen-mavsdk`.
 Ensure to get all proto using git:
 ```sh
 git submodule init
 git submodule update
 ```
 
-The first time, you therefore need to install the module in a python venv. Note that you need Python 3. First go into `../../proto/pb_plugins` and create a venv:
+The first time, you therefore need to install the module in a python venv. Note that you need Python 3. First go into `../proto/pb_plugins` and create a venv:
 
 ```sh
 pushd ../proto/pb_plugins

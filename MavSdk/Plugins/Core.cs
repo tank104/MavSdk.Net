@@ -13,7 +13,7 @@ using Version = Mavsdk.Rpc.Info.Version;
 
 namespace MavSdk.Plugins
 {
-  public class Core
+  public class Core : ICore
   {
     private readonly CoreService.CoreServiceClient _coreServiceClient;
 
@@ -22,40 +22,40 @@ namespace MavSdk.Plugins
       _coreServiceClient = new CoreService.CoreServiceClient(channel);
     }
 
-        public IObservable<ConnectionState> ConnectionState()
+    public IObservable<ConnectionState> ConnectionState()
+    {
+      return Observable.Using(() => _coreServiceClient.SubscribeConnectionState(new SubscribeConnectionStateRequest()),
+      reader => Observable.Create(
+        async (IObserver<ConnectionState> observer) =>
         {
-          return Observable.Using(() => _coreServiceClient.SubscribeConnectionState(new SubscribeConnectionStateRequest()),
-          reader => Observable.Create(
-            async (IObserver<ConnectionState> observer) =>
-            {
-              try
-              {
-                while (await reader.ResponseStream.MoveNext(CancellationToken.None))
-                {
-                  observer.OnNext(reader.ResponseStream.Current.ConnectionState);
-                }
-                observer.OnCompleted();
-              }
-              catch (Exception ex)
-              {
-                observer.OnError(ex);
-              }
-            }
-          ));
-        }
-
-        public IObservable<Unit> SetMavlinkTimeout(double timeoutS)
-        {
-          return Observable.Create<Unit>(observer =>
+          try
           {
-            var request = new SetMavlinkTimeoutRequest();
-            request.TimeoutS = timeoutS;
-            _coreServiceClient.SetMavlinkTimeout(request);
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+            {
+              observer.OnNext(reader.ResponseStream.Current.ConnectionState);
+            }
             observer.OnCompleted();
-
-            return Task.FromResult(Disposable.Empty);
-          });
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
         }
+      ));
+    }
+
+    public IObservable<Unit> SetMavlinkTimeout(double timeoutS)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetMavlinkTimeoutRequest();
+        request.TimeoutS = timeoutS;
+        _coreServiceClient.SetMavlinkTimeout(request);
+        observer.OnCompleted();
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
   }
 
   
