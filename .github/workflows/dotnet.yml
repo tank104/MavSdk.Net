@@ -17,7 +17,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'MAVSDK.sln'
+      SOLUTION: 'MavSdk.Net.sln'
 
     runs-on: ubuntu-latest
 

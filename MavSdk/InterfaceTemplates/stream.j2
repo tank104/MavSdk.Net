@@ -1,0 +1,1 @@
+IObservable<{% if return_type.is_repeated %}List<{{ return_type.inner_name }}>{% elif return_type.name == 'Status'%}Mavsdk.Rpc.{{ plugin_name.upper_camel_case }}.{{ return_type.name }}{% else %}{{ return_type.name }}{% endif %}> {% if name.upper_camel_case == plugin_name.upper_camel_case %}Observe{% endif %}{{ name.upper_camel_case }}();

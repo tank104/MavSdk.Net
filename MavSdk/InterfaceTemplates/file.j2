@@ -1,0 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Reactive;
+using Mavsdk.Rpc.{{ plugin_name.upper_camel_case }};
+
+using Version = Mavsdk.Rpc.Info.Version;
+
+namespace MavSdk.Plugins
+{
+  public interface I{{ plugin_name.upper_camel_case }}
+  { {%- for method in methods %}
+{{ indent(method, 1) }}
+{%- endfor %}
+  }
+}

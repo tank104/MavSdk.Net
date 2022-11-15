@@ -1,7 +1,7 @@
-# MAVSDK.NET
-MAVSDK client for C#. https://mavsdk.mavlink.io
+# MavSdk.NET
+MavSdk client for C#. https://mavsdk.mavlink.io
 
-(Originally forked from https://github.com/mavlink/MAVSDK-CSharp)
+(Originally forked from https://github.com/mavlink/MavSdk-CSharp)
 
 Things to still do:
 - [x] Add/Update latest proto
@@ -10,10 +10,10 @@ Things to still do:
 - [ ] Add Unit Tests
 
 To get started:
-1. Download and run latest mavsdk_server_bin.exe (or other OS equivilent) from [MAVSDK Releases](https://github.com/mavlink/MAVSDK/releases) (this repo currently tested on v1.4.7).
+1. Download and run latest mavsdk_server_bin.exe (or other OS equivilent) from [MavSdk Releases](https://github.com/mavlink/MavSdk/releases) (this repo currently tested on v1.4.7).
 1. Run your Simulator and HITL/SITL (tested with [AirSim](https://github.com/tank104/AirSim) and [PX4](https://microsoft.github.io/AirSim/px4_sitl_wsl2/))
 1. Create a new .NET 6 project
-1. Install latest package `dotnet add package MAVSDK.NET --version x.x.x`
+1. Install latest package `dotnet add package MavSdk.NET --version x.x.x`
 1. Use example code below
 ```cs
 using System;
@@ -23,7 +23,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Mavsdk.Rpc.Mission;
 
-namespace MAVSDK.CSharp.ConsoleClient
+namespace MavSdk.CSharp.ConsoleClient
 {
   class Program
   {
