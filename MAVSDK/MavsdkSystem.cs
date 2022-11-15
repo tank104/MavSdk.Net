@@ -5,41 +5,9 @@ using Action = MAVSDK.Plugins.Action;
 
 namespace MAVSDK
 {
-  public class MavsdkSystem : IDisposable
+  public class MavsdkSystem : IMavsdkSystem
   {
-    private readonly GrpcChannel _channel;
-
-    public Action Action { get; }
-    public ActionServer ActionServer { get; }
-    public Calibration Calibration { get; }
-    public Camera Camera { get; }
-    public ComponentInformation ComponentInformation { get; }
-    public ComponentInformationServer ComponentInformationServer { get; }
-    public Core Core { get; }
-    public Failure Failure { get; }
-    public FollowMe FollowMe { get; }
-    public Ftp Ftp { get; }
-    public Geofence Geofence { get; }
-    public Gimbal Gimbal { get; }
-    public Info Info { get; }
-    public LogFiles LogFiles { get; }
-    public ManualControl ManualControl { get; }
-    public Mission Mission { get; }
-    public MissionRaw MissionRaw { get; }
-    public MissionRawServer MissionRawServer { get; }
-    public Mocap Mocap { get; }
-    public Offboard Offboard { get; }
-    public Param Param { get; }
-    public ParamServer ParamServer { get; }
-    public Rtk Rtk { get; }
-    public ServerUtility ServerUtility { get; }
-    public Shell Shell { get; }
-    public Telemetry Telemetry { get; }
-    public TelemetryServer TelemetryServer { get; }
-    public TrackingServer TrackingServer { get; }
-    public Transponder Transponder { get; }
-    public Tune Tune { get; }
-
+    #region Constructors
 
     public MavsdkSystem(Uri address)
     {
@@ -77,27 +45,78 @@ namespace MAVSDK
       Tune = new Tune(_channel);
     }
 
-    private void ReleaseUnmanagedResources()
-    {
-      try
-      {
-        _channel.ShutdownAsync().Wait(60000);
-      }
-      catch (Exception)
-      {
-        //ignored
-      }
-    }
+    #endregion
+
+    #region Public Properties
+
+    public Action Action { get; }
+    public ActionServer ActionServer { get; }
+    public Calibration Calibration { get; }
+    public Camera Camera { get; }
+    public ComponentInformation ComponentInformation { get; }
+    public ComponentInformationServer ComponentInformationServer { get; }
+    public Core Core { get; }
+    public Failure Failure { get; }
+    public FollowMe FollowMe { get; }
+    public Ftp Ftp { get; }
+    public Geofence Geofence { get; }
+    public Gimbal Gimbal { get; }
+    public Info Info { get; }
+    public LogFiles LogFiles { get; }
+    public ManualControl ManualControl { get; }
+    public Mission Mission { get; }
+    public MissionRaw MissionRaw { get; }
+    public MissionRawServer MissionRawServer { get; }
+    public Mocap Mocap { get; }
+    public Offboard Offboard { get; }
+    public Param Param { get; }
+    public ParamServer ParamServer { get; }
+    public Rtk Rtk { get; }
+    public ServerUtility ServerUtility { get; }
+    public Shell Shell { get; }
+    public Telemetry Telemetry { get; }
+    public TelemetryServer TelemetryServer { get; }
+    public TrackingServer TrackingServer { get; }
+    public Transponder Transponder { get; }
+    public Tune Tune { get; }
+
+    #endregion
+
+    #region Public Methods
 
     public void Dispose()
     {
-      ReleaseUnmanagedResources();
+      Dispose(true);
       GC.SuppressFinalize(this);
     }
 
-    ~MavsdkSystem()
+    #endregion
+
+    #region Protected Members
+
+    protected virtual void Dispose(bool disposing)
     {
-      ReleaseUnmanagedResources();
+      if (!_disposed && disposing)
+      {
+        try
+        {
+          _channel.ShutdownAsync().Wait(60000);
+        }
+        catch (Exception)
+        {
+          //ignored
+        }
+        _disposed = true;
+      }
     }
+
+    #endregion
+
+    #region Private Members
+
+    private bool _disposed = false;
+    private readonly GrpcChannel _channel;
+
+    #endregion
   }
 }
