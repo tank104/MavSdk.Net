@@ -11,7 +11,7 @@ using Mavsdk.Rpc.LogFiles;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public class LogFiles : ILogFiles
   {

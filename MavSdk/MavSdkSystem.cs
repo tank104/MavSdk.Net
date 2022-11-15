@@ -1,8 +1,8 @@
 ﻿using System;
 using Grpc.Net.Client;
-using MavSdk.Plugins;
+using Mavsdk.Plugins;
 
-namespace MavSdk
+namespace Mavsdk
 {
   public class MavSdkSystem : IMavSdkSystem
   {

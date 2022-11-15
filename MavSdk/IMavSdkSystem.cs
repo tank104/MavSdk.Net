@@ -1,7 +1,7 @@
-﻿using MavSdk.Plugins;
+﻿using Mavsdk.Plugins;
 using System;
 
-namespace MavSdk
+namespace Mavsdk
 {
   public interface IMavSdkSystem : IDisposable
   {

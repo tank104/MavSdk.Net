@@ -11,7 +11,7 @@ using Mavsdk.Rpc.Info;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public class Info : IInfo
   {

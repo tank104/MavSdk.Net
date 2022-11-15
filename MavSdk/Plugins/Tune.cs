@@ -11,7 +11,7 @@ using Mavsdk.Rpc.Tune;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public class Tune : ITune
   {

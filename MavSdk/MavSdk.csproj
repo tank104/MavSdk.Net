@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <RootNamespace>MavSdk</RootNamespace>
+    <RootNamespace>Mavsdk</RootNamespace>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>MavSdk library for .NET</Title>
     <PackageId>MavSdk.Net</PackageId>
@@ -34,6 +34,8 @@ The libraries can be used onboard a drone on a companion computer or on the grou
       <ProtoCClassCommand>$(Protobuf_ProtocFullPath) --plugin=protoc-gen-custom=../proto/pb_plugins/venv/bin/protoc-gen-mavsdk --custom_opt=file_ext=cs,template_path=ClassTemplates --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCClassCommand>
     </PropertyGroup>
     <Message Importance="high" Text="$(ProtoCInterfaceCommand)" />
+    <!--Not tested below in linux yet, basically needs to add I to start of all files since they are interfaces.-->
+    <Exec Command="del /F /Q &quot;./Plugins&quot;" />
     <Exec Command="$(ProtoCInterfaceCommand)" />
     <!--Not tested below in linux yet, basically needs to add I to start of all files since they are interfaces.-->
     <Exec Command="FOR /r &quot;./Plugins&quot; %%a in (*.cs) DO REN &quot;%%~a&quot; &quot;I%%~nxa&quot;" />
@@ -46,6 +48,7 @@ The libraries can be used onboard a drone on a companion computer or on the grou
         <ProtoCClassCommand>protoc.exe --plugin=protoc-gen-custom=../proto/pb_plugins/venv/Scripts/protoc-gen-mavsdk.exe --custom_opt="file_ext=cs,template_path=ClassTemplates" --custom_out=Plugins @(Protobuf->'-I%(RelativeDir)', ' ') @(Protobuf->'%(Filename)%(Extension)', ' ')</ProtoCClassCommand>
     </PropertyGroup>
     <Message Importance="high" Text="$(ProtoCInterfaceCommand)" />
+    <Exec Command="del /F /Q &quot;./Plugins&quot;" />
     <Exec Command="$(ProtoCInterfaceCommand)" />
     <Exec Command="FOR /r &quot;./Plugins&quot; %%a in (*.cs) DO REN &quot;%%~a&quot; &quot;I%%~nxa&quot;" />
     <Message Importance="high" Text="$(ProtoCClassCommand)" />

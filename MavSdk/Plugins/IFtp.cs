@@ -5,7 +5,7 @@ using Mavsdk.Rpc.Ftp;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public interface IFtp
   {

@@ -5,7 +5,7 @@ using Mavsdk.Rpc.Telemetry;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public interface ITelemetry
   {
