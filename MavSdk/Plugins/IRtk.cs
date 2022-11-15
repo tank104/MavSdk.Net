@@ -5,7 +5,7 @@ using Mavsdk.Rpc.Rtk;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public interface IRtk
   {

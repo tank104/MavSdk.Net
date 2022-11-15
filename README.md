@@ -23,7 +23,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Mavsdk.Rpc.Mission;
 
-namespace MavSdk.CSharp.ConsoleClient
+namespace Mavsdk.CSharp.ConsoleClient
 {
   class Program
   {
@@ -40,7 +40,7 @@ namespace MavSdk.CSharp.ConsoleClient
        *     - emit an event only when the value changes
        *     - discard the altitudes lower than 0
        */
-      var drone = new MavsdkSystem(new Uri($"http://{Host}:{Port}"));
+      var drone = new MavSdkSystem(new Uri($"http://{Host}:{Port}"));
       var tcs = new TaskCompletionSource<bool>();
 
       drone.Telemetry.Position()

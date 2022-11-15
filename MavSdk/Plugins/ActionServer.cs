@@ -11,7 +11,7 @@ using Mavsdk.Rpc.ActionServer;
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public class ActionServer : IActionServer
   {

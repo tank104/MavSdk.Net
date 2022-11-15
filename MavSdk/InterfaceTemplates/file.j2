@@ -5,7 +5,7 @@ using Mavsdk.Rpc.{{ plugin_name.upper_camel_case }};
 
 using Version = Mavsdk.Rpc.Info.Version;
 
-namespace MavSdk.Plugins
+namespace Mavsdk.Plugins
 {
   public interface I{{ plugin_name.upper_camel_case }}
   { {%- for method in methods %}
