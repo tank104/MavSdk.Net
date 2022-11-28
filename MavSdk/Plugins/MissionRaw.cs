@@ -43,6 +43,48 @@ namespace Mavsdk.Plugins
       });
     }
 
+    public IObservable<Unit> UploadGeofence(List<MissionItem> missionItems)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new UploadGeofenceRequest();
+        request.MissionItems.AddRange(missionItems);
+        var uploadGeofenceResponse = _missionRawServiceClient.UploadGeofence(request);
+        var missionRawResult = uploadGeofenceResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> UploadRallyPoints(List<MissionItem> missionItems)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new UploadRallyPointsRequest();
+        request.MissionItems.AddRange(missionItems);
+        var uploadRallyPointsResponse = _missionRawServiceClient.UploadRallyPoints(request);
+        var missionRawResult = uploadRallyPointsResponse.MissionRawResult;
+        if (missionRawResult.Result == MissionRawResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new MissionRawException(missionRawResult.Result, missionRawResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
     public IObservable<Unit> CancelMissionUpload()
     {
       return Observable.Create<Unit>(observer =>
