@@ -15,6 +15,7 @@ namespace Mavsdk
       ActionServer = new ActionServer(_channel);
       Calibration = new Calibration(_channel);
       Camera = new Camera(_channel);
+      CameraServer = new CameraServer(_channel);
       ComponentInformation = new ComponentInformation(_channel);
       ComponentInformationServer = new ComponentInformationServer(_channel);
       Core = new Core(_channel);
@@ -54,6 +55,8 @@ namespace Mavsdk
     public ICalibration Calibration { get; }
 
     public ICamera Camera { get; }
+
+    public ICameraServer CameraServer { get; }
 
     public IComponentInformation ComponentInformation { get; }
 
