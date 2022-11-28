@@ -71,6 +71,9 @@ The libraries can be used onboard a drone on a companion computer or on the grou
     <Protobuf Include="..\proto\protos\camera\camera.proto" Link="proto\camera\camera.proto" ProtoRoot="..\proto\protos" />
   </ItemGroup>
   <ItemGroup>
+    <Protobuf Include="..\proto\protos\camera_server\camera_server.proto" Link="proto\camera_server\camera_server.proto" ProtoRoot="..\proto\protos" />
+  </ItemGroup>
+  <ItemGroup>
     <Protobuf Include="..\proto\protos\component_information\component_information.proto" Link="proto\component_information\component_information.proto" ProtoRoot="..\proto\protos" />
   </ItemGroup>
   <ItemGroup>

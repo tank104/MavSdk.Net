@@ -10,6 +10,8 @@ namespace Mavsdk.Plugins
   public interface IMissionRaw
   {
     IObservable<Unit> UploadMission(List<MissionItem> missionItems);
+    IObservable<Unit> UploadGeofence(List<MissionItem> missionItems);
+    IObservable<Unit> UploadRallyPoints(List<MissionItem> missionItems);
     IObservable<Unit> CancelMissionUpload();
     IObservable<List<MissionItem>> DownloadMission();
     IObservable<Unit> CancelMissionDownload();

@@ -7,7 +7,6 @@ namespace Mavsdk
   public class MavSdkSystem : IMavSdkSystem
   {
     #region Constructors
-
     public MavSdkSystem(Uri address)
     {
       _channel = GrpcChannel.ForAddress(address);

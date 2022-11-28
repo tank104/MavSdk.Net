@@ -748,6 +748,28 @@ namespace Mavsdk.Plugins
       ));
     }
 
+    public IObservable<Altitude> Altitude()
+    {
+      return Observable.Using(() => _telemetryServiceClient.SubscribeAltitude(new SubscribeAltitudeRequest()),
+      reader => Observable.Create(
+        async (IObserver<Altitude> observer) =>
+        {
+          try
+          {
+            while (await reader.ResponseStream.MoveNext(CancellationToken.None))
+            {
+              observer.OnNext(reader.ResponseStream.Current.Altitude);
+            }
+            observer.OnCompleted();
+          }
+          catch (Exception ex)
+          {
+            observer.OnError(ex);
+          }
+        }
+      ));
+    }
+
     public IObservable<Unit> SetRatePosition(double rateHz)
     {
       return Observable.Create<Unit>(observer =>
@@ -853,14 +875,35 @@ namespace Mavsdk.Plugins
       });
     }
 
-    public IObservable<Unit> SetRateAttitude(double rateHz)
+    public IObservable<Unit> SetRateAttitudeQuaternion(double rateHz)
     {
       return Observable.Create<Unit>(observer =>
       {
-        var request = new SetRateAttitudeRequest();
+        var request = new SetRateAttitudeQuaternionRequest();
         request.RateHz = rateHz;
-        var setRateAttitudeResponse = _telemetryServiceClient.SetRateAttitude(request);
-        var telemetryResult = setRateAttitudeResponse.TelemetryResult;
+        var setRateAttitudeQuaternionResponse = _telemetryServiceClient.SetRateAttitudeQuaternion(request);
+        var telemetryResult = setRateAttitudeQuaternionResponse.TelemetryResult;
+        if (telemetryResult.Result == TelemetryResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new TelemetryException(telemetryResult.Result, telemetryResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> SetRateAttitudeEuler(double rateHz)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetRateAttitudeEulerRequest();
+        request.RateHz = rateHz;
+        var setRateAttitudeEulerResponse = _telemetryServiceClient.SetRateAttitudeEuler(request);
+        var telemetryResult = setRateAttitudeEulerResponse.TelemetryResult;
         if (telemetryResult.Result == TelemetryResult.Types.Result.Success)
         {
           observer.OnCompleted();
@@ -1197,6 +1240,27 @@ namespace Mavsdk.Plugins
         request.RateHz = rateHz;
         var setRateDistanceSensorResponse = _telemetryServiceClient.SetRateDistanceSensor(request);
         var telemetryResult = setRateDistanceSensorResponse.TelemetryResult;
+        if (telemetryResult.Result == TelemetryResult.Types.Result.Success)
+        {
+          observer.OnCompleted();
+        }
+        else
+        {
+          observer.OnError(new TelemetryException(telemetryResult.Result, telemetryResult.ResultStr));
+        }
+
+        return Task.FromResult(Disposable.Empty);
+      });
+    }
+
+    public IObservable<Unit> SetRateAltitude(double rateHz)
+    {
+      return Observable.Create<Unit>(observer =>
+      {
+        var request = new SetRateAltitudeRequest();
+        request.RateHz = rateHz;
+        var setRateAltitudeResponse = _telemetryServiceClient.SetRateAltitude(request);
+        var telemetryResult = setRateAltitudeResponse.TelemetryResult;
         if (telemetryResult.Result == TelemetryResult.Types.Result.Success)
         {
           observer.OnCompleted();

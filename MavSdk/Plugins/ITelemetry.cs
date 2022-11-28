@@ -42,12 +42,14 @@ namespace Mavsdk.Plugins
     IObservable<DistanceSensor> DistanceSensor();
     IObservable<ScaledPressure> ScaledPressure();
     IObservable<Heading> Heading();
+    IObservable<Altitude> Altitude();
     IObservable<Unit> SetRatePosition(double rateHz);
     IObservable<Unit> SetRateHome(double rateHz);
     IObservable<Unit> SetRateInAir(double rateHz);
     IObservable<Unit> SetRateLandedState(double rateHz);
     IObservable<Unit> SetRateVtolState(double rateHz);
-    IObservable<Unit> SetRateAttitude(double rateHz);
+    IObservable<Unit> SetRateAttitudeQuaternion(double rateHz);
+    IObservable<Unit> SetRateAttitudeEuler(double rateHz);
     IObservable<Unit> SetRateCameraAttitude(double rateHz);
     IObservable<Unit> SetRateVelocityNed(double rateHz);
     IObservable<Unit> SetRateGpsInfo(double rateHz);
@@ -64,6 +66,7 @@ namespace Mavsdk.Plugins
     IObservable<Unit> SetRateRawImu(double rateHz);
     IObservable<Unit> SetRateUnixEpochTime(double rateHz);
     IObservable<Unit> SetRateDistanceSensor(double rateHz);
+    IObservable<Unit> SetRateAltitude(double rateHz);
     IObservable<GpsGlobalOrigin> GetGpsGlobalOrigin();
   }
 }
