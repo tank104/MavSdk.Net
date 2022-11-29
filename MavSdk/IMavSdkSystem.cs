@@ -15,6 +15,8 @@ namespace Mavsdk
 
     ICamera Camera { get; }
 
+    ICameraServer CameraServer { get; }
+
     IComponentInformation ComponentInformation { get; }
 
     IComponentInformationServer ComponentInformationServer { get; }
