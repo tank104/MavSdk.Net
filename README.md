@@ -77,7 +77,7 @@ namespace Mavsdk.CSharp.ConsoleClient
       await tcs.Task;
     }
 
-    private static async Task<MissionPlan> GetSampleMissionPlan(MavsdkSystem drone)
+    private static async Task<MissionPlan> GetSampleMissionPlan(MavSdkSystem drone)
     {
       var missionPlan = new MissionPlan();
       var dronePosition = await drone.Telemetry.Position().FirstAsync();
