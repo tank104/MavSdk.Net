@@ -105,14 +105,14 @@ namespace Mavsdk.CSharp.ConsoleClient
   }
 }
 ```
-##Mavsdk_server
+## Mavsdk_server
 
-###Wunning on Windows
+### Wunning on Windows
 1. Download mavsdk-windows-x64-release.zip
 1. Extract to folder
 1. Run mavsdk_server_bin.exe
 
-##Running on Raspberry Pi
+### Running on Raspberry Pi
 1. Download mavsdk_server_linux-arm64-musl
 2. Make file executable `sudo chmod +x mavsdk_server_linux-arm64-musl
 3. Run `sudo ./mavsdk_server_linux-arm64-musl -p 50051 serial:///dev/ttyAMA0`
