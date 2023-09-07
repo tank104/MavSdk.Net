@@ -10,7 +10,7 @@ Things to still do:
 - [ ] Add Unit Tests
 
 To get started:
-1. Download and run latest mavsdk_server_bin.exe (or other OS equivilent) from [MavSdk Releases](https://github.com/mavlink/MavSdk/releases) (this repo currently tested on v1.4.7).
+1. Download and run latest mavsdk_server_bin.exe (or other OS equivilent) from [MavSdk Releases](https://github.com/mavlink/MavSdk/releases) (this repo currently tested on v1.4.16).  (See bottom for specific steps)
 1. Run your Simulator and HITL/SITL (tested with [AirSim](https://github.com/tank104/AirSim) and [PX4](https://microsoft.github.io/AirSim/px4_sitl_wsl2/))
 1. Create a new .NET 6 project
 1. Install latest package `dotnet add package MavSdk.NET --version x.x.x`
@@ -105,3 +105,14 @@ namespace Mavsdk.CSharp.ConsoleClient
   }
 }
 ```
+##Mavsdk_server
+
+###Wunning on Windows
+1. Download mavsdk-windows-x64-release.zip
+1. Extract to folder
+1. Run mavsdk_server_bin.exe
+
+##Running on Raspberry Pi
+1. Download mavsdk_server_linux-arm64-musl
+2. Make file executable `sudo chmod +x mavsdk_server_linux-arm64-musl
+3. Run `sudo ./mavsdk_server_linux-arm64-musl -p 50051 serial:///dev/ttyAMA0`
